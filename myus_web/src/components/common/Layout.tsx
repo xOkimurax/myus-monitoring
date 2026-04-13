@@ -10,10 +10,7 @@ import {
   Folder,
   Settings,
   LogOut,
-  ChevronLeft,
-  ChevronRight,
 } from 'lucide-react';
-import { useMonitoringStore } from '../../store/monitoringStore';
 
 const navItems = [
   { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -28,97 +25,54 @@ const navItems = [
 export const Sidebar = () => {
   const location = useLocation();
   const { logout, user } = useAuth();
-  const { lastSync } = useMonitoringStore();
-  const [collapsed, setCollapsed] = useState(false);
-
-  const formatLastSync = () => {
-    if (!lastSync) return 'Nunca';
-    const diff = Date.now() - lastSync;
-    if (diff < 60000) return 'Ahora';
-    if (diff < 3600000) return `${Math.floor(diff / 60000)}m`;
-    return `${Math.floor(diff / 3600000)}h`;
-  };
 
   return (
-    <aside
-      className={`fixed left-0 top-0 h-screen bg-white border-r-2 border-gray-100 transition-all duration-300 z-50 shadow-xl ${
-        collapsed ? 'w-24' : 'w-72'
-      }`}
-    >
-      <div className="flex flex-col h-full">
-        {/* Logo */}
-        <div className={`p-6 border-b-2 border-gray-100 flex items-center ${collapsed ? 'justify-center' : 'justify-between'}`}>
-          {!collapsed && (
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-[#5B5FC7] rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-200">
-                <span className="text-white font-bold text-xl">M</span>
-              </div>
-              <span className="font-bold text-2xl text-[#1F2937]">Myus</span>
-            </div>
-          )}
-          {collapsed && (
-            <div className="w-12 h-12 bg-[#5B5FC7] rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-200">
-              <span className="text-white font-bold text-xl">M</span>
-            </div>
-          )}
-        </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 p-5 overflow-y-auto">
-          <ul className="space-y-3">
-            {navItems.map((item) => {
-              const isActive = location.pathname === item.path;
-              return (
-                <li key={item.path}>
-                  <Link
-                    to={item.path}
-                    className={`flex items-center gap-4 px-5 py-4 rounded-2xl transition-all font-medium text-lg ${
-                      isActive
-                        ? 'bg-[#5B5FC7] text-white shadow-lg shadow-indigo-200'
-                        : 'text-[#6B7280] hover:bg-gray-50 hover:text-[#1F2937]'
-                    }`}
-                  >
-                    <item.icon size={24} />
-                    {!collapsed && <span>{item.label}</span>}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </nav>
-
-        {/* Sync Status */}
-        {!collapsed && (
-          <div className="px-6 py-4 border-t-2 border-gray-100">
-            <div className="flex items-center gap-3 text-sm text-[#9CA3AF]">
-              <div className="w-3 h-3 bg-[#10B981] rounded-full animate-pulse" />
-              <span>Sincronizado: {formatLastSync()}</span>
-            </div>
+    <aside className="fixed left-0 top-0 h-screen w-64 bg-white border-r border-gray-200 flex flex-col">
+      {/* Logo */}
+      <div className="p-6 border-b border-gray-100">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-[#5B5FC7] rounded-xl flex items-center justify-center">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
           </div>
-        )}
-
-        {/* User & Logout */}
-        <div className="p-5 border-t-2 border-gray-100">
-          {!collapsed && user && (
-            <div className="mb-4 text-base text-[#6B7280] truncate text-center font-medium">
-              {user.email}
-            </div>
-          )}
-          <button
-            onClick={logout}
-            className={`flex items-center gap-3 w-full px-5 py-4 text-[#6B7280] hover:bg-red-50 hover:text-red-600 rounded-2xl transition-all font-medium text-lg ${collapsed ? 'justify-center' : ''}`}
-          >
-            <LogOut size={24} />
-            {!collapsed && <span>Cerrar sesión</span>}
-          </button>
+          <span className="font-bold text-xl text-[#111827]">Myus</span>
         </div>
+      </div>
 
-        {/* Collapse Toggle */}
+      {/* Navigation */}
+      <nav className="flex-1 p-4">
+        <ul className="space-y-1">
+          {navItems.map((item) => {
+            const isActive = location.pathname === item.path;
+            return (
+              <li key={item.path}>
+                <Link
+                  to={item.path}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
+                    isActive
+                      ? 'bg-[#5B5FC7] text-white'
+                      : 'text-[#6B7280] hover:bg-gray-100 text-[#374151]'
+                  }`}
+                >
+                  <item.icon size={20} />
+                  <span className="font-medium">{item.label}</span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+
+      {/* User */}
+      <div className="p-4 border-t border-gray-100">
+        <div className="mb-3 text-sm text-[#6B7280] truncate">{user?.email}</div>
         <button
-          onClick={() => setCollapsed(!collapsed)}
-          className="absolute -right-4 top-28 w-8 h-8 bg-white border-2 border-gray-200 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all cursor-pointer"
+          onClick={logout}
+          className="flex items-center gap-2 w-full px-4 py-2.5 text-[#6B7280] hover:bg-red-50 hover:text-red-600 rounded-xl transition-colors"
         >
-          {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+          <LogOut size={18} />
+          <span className="font-medium">Cerrar sesión</span>
         </button>
       </div>
     </aside>
@@ -127,10 +81,10 @@ export const Sidebar = () => {
 
 export const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="min-h-screen bg-[#FAFBFC]">
+    <div className="min-h-screen bg-[#FAFAFA]">
       <Sidebar />
-      <main className="ml-72 min-h-screen p-10">
-        <div className="max-w-7xl mx-auto animate-fade-in">
+      <main className="ml-64 p-8">
+        <div className="max-w-6xl mx-auto">
           {children}
         </div>
       </main>

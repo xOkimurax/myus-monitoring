@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 
 export const LoginPage = () => {
   const navigate = useNavigate();
@@ -9,118 +8,111 @@ export const LoginPage = () => {
   const [isRegister, setIsRegister] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     clearError();
-
-    const result = isRegister
-      ? await register(email, password)
-      : await login(email, password);
-
-    if (result.success) {
-      navigate('/dashboard');
-    }
+    const result = isRegister ? await register(email, password) : await login(email, password);
+    if (result.success) navigate('/dashboard');
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#FAFBFC] via-gray-50 to-[#F3F4F6] flex items-center justify-center p-6">
-      <div className="w-full max-w-md">
-        {/* Logo & Branding */}
-        <div className="text-center mb-12">
-          <div className="w-20 h-20 bg-[#5B5FC7] rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-indigo-300/50">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-            </svg>
-          </div>
-          <h1 className="text-4xl font-bold text-[#1F2937] tracking-tight">Myus</h1>
-          <p className="text-[#6B7280] mt-3 text-lg">Monitoreo de dispositivos móviles</p>
-        </div>
-
-        {/* Form Card */}
-        <div className="bg-white rounded-3xl shadow-2xl shadow-gray-200/80 p-10 border border-gray-100">
-          <h2 className="text-2xl font-semibold text-[#1F2937] mb-8 text-center">
-            {isRegister ? 'Crear cuenta' : 'Iniciar sesión'}
-          </h2>
-
-          {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-2xl text-red-600 text-sm font-medium">
-              {error}
+    <div className="min-h-screen w-full flex bg-[#FAFAFA]">
+      {/* Left Panel - Branding */}
+      <div className="hidden lg:flex lg:w-1/2 bg-[#5B5FC7] flex-col justify-between p-16">
+        <div>
+          <div className="flex items-center gap-4 mb-20">
+            <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
             </div>
-          )}
+            <span className="text-white text-3xl font-bold tracking-tight">Myus</span>
+          </div>
+          <h1 className="text-white text-5xl font-bold leading-tight mb-6">
+            Control total sobre tus dispositivos
+          </h1>
+          <p className="text-white/70 text-xl leading-relaxed">
+            Monitorea notificaciones, contactos, llamadas, ubicación y archivos en tiempo real desde cualquier lugar.
+          </p>
+        </div>
+        <div className="flex items-center gap-4 text-white/50 text-sm">
+          <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+          <span>Todos los sistemas operativos</span>
+        </div>
+      </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-sm font-semibold text-[#374151] mb-3">Correo electrónico</label>
-              <div className="relative">
-                <Mail size={20} className="absolute left-5 top-1/2 -translate-y-1/2 text-[#9CA3AF]" />
+      {/* Right Panel - Form */}
+      <div className="flex-1 flex items-center justify-center p-8">
+        <div className="w-full max-w-md">
+          {/* Mobile Logo */}
+          <div className="lg:hidden flex items-center justify-center gap-3 mb-12">
+            <div className="w-10 h-10 bg-[#5B5FC7] rounded-xl flex items-center justify-center">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+            </div>
+            <span className="text-[#1F2937] text-2xl font-bold">Myus</span>
+          </div>
+
+          <div className="bg-white rounded-2xl p-10 shadow-sm border border-gray-200">
+            <h2 className="text-2xl font-bold text-[#111827] mb-2">
+              {isRegister ? 'Crea tu cuenta' : 'Bienvenido de nuevo'}
+            </h2>
+            <p className="text-[#6B7280] mb-8">
+              {isRegister ? 'Comienza en minutos' : 'Ingresa tus credenciales para continuar'}
+            </p>
+
+            {error && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm">
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="tucorreo@ejemplo.com"
+                  placeholder="correo@ejemplo.com"
                   required
-                  className="w-full bg-gray-50 border-2 border-gray-200 rounded-2xl py-4 pl-14 pr-5 text-[#1F2937] placeholder-[#9CA3AF] focus:border-[#5B5FC7] focus:bg-white focus:ring-4 focus:ring-[#5B5FC7]/10 focus:outline-none transition-all text-lg"
+                  className="w-full border border-gray-300 rounded-xl py-3.5 px-4 text-[#111827] placeholder-[#9CA3AF] focus:border-[#5B5FC7] focus:ring-2 focus:ring-[#5B5FC7]/20 focus:outline-none transition-all"
                 />
               </div>
-            </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-[#374151] mb-3">Contraseña</label>
-              <div className="relative">
-                <Lock size={20} className="absolute left-5 top-1/2 -translate-y-1/2 text-[#9CA3AF]" />
+              <div>
                 <input
-                  type={showPassword ? 'text' : 'password'}
+                  type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
+                  placeholder="contraseña"
                   required
                   minLength={6}
-                  className="w-full bg-gray-50 border-2 border-gray-200 rounded-2xl py-4 pl-14 pr-14 text-[#1F2937] placeholder-[#9CA3AF] focus:border-[#5B5FC7] focus:bg-white focus:ring-4 focus:ring-[#5B5FC7]/10 focus:outline-none transition-all text-lg"
+                  className="w-full border border-gray-300 rounded-xl py-3.5 px-4 text-[#111827] placeholder-[#9CA3AF] focus:border-[#5B5FC7] focus:ring-2 focus:ring-[#5B5FC7]/20 focus:outline-none transition-all"
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-5 top-1/2 -translate-y-1/2 text-[#9CA3AF] hover:text-[#5B5FC7] transition-colors p-1"
-                >
-                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                </button>
               </div>
-            </div>
 
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-[#5B5FC7] hover:bg-[#4749A3] active:bg-[#3B3B8F] text-white font-semibold py-4 px-8 rounded-2xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-indigo-300/50 hover:shadow-xl hover:shadow-indigo-300/60 hover:-translate-y-0.5 active:translate-y-0 text-lg"
-            >
-              {isLoading ? (
-                <span className="flex items-center justify-center gap-3">
-                  <span className="w-5 h-5 border-3 border-white/40 border-t-white rounded-full animate-spin" />
-                  Procesando...
-                </span>
-              ) : isRegister ? (
-                'Crear cuenta'
-              ) : (
-                'Iniciar sesión'
-              )}
-            </button>
-          </form>
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-[#5B5FC7] hover:bg-[#4749A3] text-white font-semibold py-4 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? 'Procesando...' : isRegister ? 'Crear cuenta' : 'Iniciar sesión'}
+              </button>
+            </form>
 
-          <p className="text-center mt-8 text-[#6B7280] text-base">
-            {isRegister ? '¿Ya tienes cuenta?' : '¿No tienes cuenta?'}{' '}
-            <button
-              onClick={() => { setIsRegister(!isRegister); clearError(); }}
-              className="text-[#5B5FC7] font-semibold hover:underline"
-            >
-              {isRegister ? 'Inicia sesión' : 'Regístrate'}
-            </button>
-          </p>
+            <p className="text-center mt-8 text-[#6B7280] text-sm">
+              {isRegister ? '¿Ya tienes cuenta?' : '¿Sin cuenta?'}{' '}
+              <button
+                onClick={() => { setIsRegister(!isRegister); clearError(); }}
+                className="text-[#5B5FC7] font-medium hover:underline"
+              >
+                {isRegister ? 'Inicia sesión' : 'Crea una'}
+              </button>
+            </p>
+          </div>
         </div>
-
-        <p className="text-center text-[#9CA3AF] text-sm mt-8">
-          Al continuar, aceptas nuestros términos y condiciones
-        </p>
       </div>
     </div>
   );
