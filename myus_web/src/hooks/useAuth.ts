@@ -1,121 +1,85 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback } from 'react';
 import { useAuthStore } from '../store/authStore';
-import { authApi } from '../api/endpoints';
+import { insforge } from '../api/insforgeClient';
 import { User } from '../types';
 
 export const useAuth = () => {
   const { user, isAuthenticated, login, logout, setLoading, setError, error, isLoading, clearError } = useAuthStore();
-  const [rememberMe, setRememberMe] = useState(true);
 
-  const handleLogin = useCallback(async (email: string, password: string) => {
+  const handleGoogleLogin = useCallback(async () => {
     clearError();
     setLoading(true);
 
     try {
-      // Get or create device ID
-      let deviceId = localStorage.getItem('device_id');
-      if (!deviceId) {
-        deviceId = crypto.randomUUID();
-        localStorage.setItem('device_id', deviceId);
+      const { data, error: oauthError } = await insforge.auth.signInWithOAuth({
+        provider: 'google',
+        redirectTo: window.location.origin + '/dashboard',
+      });
+
+      if (oauthError) {
+        setError(oauthError.message);
+        setLoading(false);
+        return { success: false, error: oauthError.message };
       }
 
-      const response = await authApi.login(email, password);
-
-      const userData: User = {
-        id: response.user.id,
-        email: response.user.email,
-        deviceId: deviceId,
-        accessToken: response.access_token,
-      };
-
-      login(userData);
-      localStorage.setItem('user', JSON.stringify(userData));
+      // OAuth redirects, so we don't need to do anything here
+      // The page will redirect to Google, and after auth, to the redirect URL
+      if (data?.url) {
+        window.location.href = data.url;
+      }
 
       return { success: true };
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || 'Error al iniciar sesión';
+      const errorMessage = err.message || 'Error al iniciar con Google';
       setError(errorMessage);
-      return { success: false, error: errorMessage };
-    } finally {
       setLoading(false);
-    }
-  }, [clearError, login, setError, setLoading]);
-
-  const handleRegister = useCallback(async (email: string, password: string) => {
-    clearError();
-    setLoading(true);
-
-    try {
-      let deviceId = localStorage.getItem('device_id');
-      if (!deviceId) {
-        deviceId = crypto.randomUUID();
-        localStorage.setItem('device_id', deviceId);
-      }
-
-      const response = await authApi.register(email, password, deviceId);
-
-      const userData: User = {
-        id: response.user.id,
-        email: response.user.email,
-        deviceId: deviceId,
-        accessToken: response.access_token,
-      };
-
-      login(userData);
-      localStorage.setItem('user', JSON.stringify(userData));
-
-      return { success: true };
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || 'Error al registrar';
-      setError(errorMessage);
       return { success: false, error: errorMessage };
-    } finally {
-      setLoading(false);
     }
-  }, [clearError, login, setError, setLoading]);
+  }, [clearError, setError, setLoading]);
 
-  const handleLogout = useCallback(async () => {
-    try {
-      await authApi.logout();
-    } catch {
-      // Ignore logout errors
-    } finally {
-      logout();
-    }
-  }, [logout]);
-
-  const checkAuth = useCallback(() => {
+  const checkAuth = useCallback(async () => {
     const storedUser = localStorage.getItem('user');
-    const token = localStorage.getItem('auth_token');
 
-    if (storedUser && token) {
+    if (storedUser) {
       try {
         const userData = JSON.parse(storedUser) as User;
-        login(userData);
-        return true;
+        // Check if session is still valid
+        const { data } = await insforge.auth.getCurrentUser();
+        if (data?.user) {
+          login(userData);
+          return true;
+        }
+        // Session expired, clear storage
+        localStorage.removeItem('user');
+        return false;
       } catch {
         localStorage.removeItem('user');
-        localStorage.removeItem('auth_token');
         return false;
       }
     }
     return false;
   }, [login]);
 
-  useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
+  const handleLogout = useCallback(async () => {
+    try {
+      await insforge.auth.signOut();
+    } catch {
+      // Ignore logout errors
+    } finally {
+      logout();
+      localStorage.removeItem('user');
+    }
+  }, [logout]);
 
   return {
     user,
     isAuthenticated,
     isLoading,
     error,
-    rememberMe,
-    setRememberMe,
-    login: handleLogin,
-    register: handleRegister,
+    login: handleGoogleLogin,
+    register: handleGoogleLogin, // Same flow for register
     logout: handleLogout,
     clearError,
+    checkAuth,
   };
 };
