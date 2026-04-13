@@ -26,35 +26,35 @@ export const Sidebar = () => {
   const { logout, user } = useAuth();
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-[280px] bg-white border-r border-[#E2E8F0] flex flex-col">
+    <aside className="fixed left-0 top-0 h-screen w-[240px] bg-white border-r border-[#E2E8F0] flex flex-col">
       {/* Logo */}
-      <div className="px-8 py-8 border-b border-[#E2E8F0]">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-[#5B5FC7] rounded-2xl flex items-center justify-center">
-            <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+      <div className="px-6 py-5 border-b border-[#E2E8F0]">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 bg-[#5B5FC7] rounded-lg flex items-center justify-center">
+            <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
             </svg>
           </div>
-          <span className="font-bold text-2xl text-[#1A202C]">Myus</span>
+          <span className="font-semibold text-lg text-[#1A202C]">Myus</span>
         </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-5 py-6">
-        <ul className="space-y-3">
+      <nav className="flex-1 px-4 py-4">
+        <ul className="space-y-1">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
             return (
               <li key={item.path}>
                 <Link
                   to={item.path}
-                  className={`flex items-center gap-4 px-5 py-4 rounded-2xl font-medium text-base transition-colors ${
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium text-sm transition-colors ${
                     isActive
-                      ? 'bg-[#5B5FC7] text-white shadow-md'
+                      ? 'bg-[#5B5FC7] text-white'
                       : 'text-[#718096] hover:bg-[#F5F7FA] hover:text-[#1A202C]'
                   }`}
                 >
-                  <item.icon size={22} />
+                  <item.icon size={18} />
                   <span>{item.label}</span>
                 </Link>
               </li>
@@ -64,13 +64,13 @@ export const Sidebar = () => {
       </nav>
 
       {/* User */}
-      <div className="px-5 py-6 border-t border-[#E2E8F0]">
-        <div className="mb-4 text-base text-[#718096] truncate px-5">{user?.email}</div>
+      <div className="px-4 py-4 border-t border-[#E2E8F0]">
+        <div className="mb-2 text-xs text-[#A0AEC0] truncate px-3">{user?.email}</div>
         <button
           onClick={logout}
-          className="flex items-center gap-3 w-full px-5 py-4 text-[#718096] hover:bg-red-50 hover:text-red-600 rounded-2xl transition-colors font-medium text-base"
+          className="flex items-center gap-2 w-full px-3 py-2.5 text-[#718096] hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors text-sm"
         >
-          <LogOut size={22} />
+          <LogOut size={16} />
           <span>Cerrar sesión</span>
         </button>
       </div>
@@ -82,8 +82,8 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="min-h-screen bg-[#F5F7FA]">
       <Sidebar />
-      <main className="ml-[280px] p-12">
-        <div className="max-w-[1400px] mx-auto">
+      <main className="ml-[240px] p-8">
+        <div className="max-w-[1200px] mx-auto">
           {children}
         </div>
       </main>
