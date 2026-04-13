@@ -40,21 +40,57 @@ appmonitoreo/
 │       ├── locations-sync.ts
 │       └── files-sync.ts
 │
-└── README.md
+├── deploy-web.sh          # Web panel deployment script
+├── deploy-backend.sh      # Backend deployment script
+└── build-android.sh       # Android APK build script
 ```
 
-## Setup Instructions
+## Quick Start
 
 ### 1. Backend (Insforge)
 
-The edge functions are in `myus_backend/edge-functions/`. To deploy:
+Link to your Insforge project and deploy edge functions:
+
+```bash
+# Link project (use your project ID)
+npx @insforge/cli link --project-id YOUR_PROJECT_ID
+
+# Deploy all edge functions
+./deploy-backend.sh
+```
+
+Or deploy individually:
 
 ```bash
 cd myus_backend
-npx @insforge/cli functions deploy auth-login --project-id 8d93d3ee-ba57-42e5-ace7-29518396a2d4
+npx @insforge/cli functions deploy auth-login
+npx @insforge/cli functions deploy auth-register
+npx @insforge/cli functions deploy notifications-sync
+npx @insforge/cli functions deploy contacts-sync
+npx @insforge/cli functions deploy call-logs-sync
+npx @insforge/cli functions deploy locations-sync
+npx @insforge/cli functions deploy files-sync
 ```
 
-### 2. Mobile App
+### 2. Web Panel
+
+Build and deploy the React web dashboard:
+
+```bash
+cd myus_web
+pnpm install
+pnpm build
+
+# Deploy to Vercel (requires authentication)
+npx vercel deploy dist --prod
+
+# Or use the script
+./deploy-web.sh
+```
+
+For Vercel CI/CD deployment, set `VERCEL_TOKEN` environment variable.
+
+### 3. Mobile App
 
 ```bash
 cd myus
@@ -62,14 +98,7 @@ flutter pub get
 flutter build apk --debug
 ```
 
-### 3. Web Panel
-
-```bash
-cd myus_web
-pnpm install
-pnpm build
-# Serve dist/ folder with any static hosting
-```
+The APK will be at `myus/build/app/outputs/flutter-apk/app-debug.apk`
 
 ## Features
 
@@ -97,3 +126,9 @@ pnpm build
 | POST | /call-logs/sync | Sync call logs |
 | POST | /locations/sync | Sync locations |
 | POST | /files/sync | Sync file events |
+
+## Deployment Status
+
+- [x] Flutter Android App - Ready to build
+- [x] React Web Dashboard - Built in `myus_web/dist/`
+- [x] Backend Edge Functions - Ready in `myus_backend/edge-functions/`
