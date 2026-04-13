@@ -1,19 +1,5 @@
 @import "tailwindcss";
 
-:root {
-  --primary: #5B5FC7;
-  --primary-dark: #4749A3;
-  --secondary: #7DD3C0;
-  --background: #FAFBFC;
-  --surface: #FFFFFF;
-  --error: #EF4444;
-  --warning: #F59E0B;
-  --success: #10B981;
-  --text-primary: #1F2937;
-  --text-secondary: #6B7280;
-  --border: #E5E7EB;
-}
-
 * {
   box-sizing: border-box;
   margin: 0;
@@ -21,43 +7,22 @@
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background-color: var(--background);
-  color: var(--text-primary);
-  min-height: 100vh;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: #FAFAFA;
+  color: #111827;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 #root {
   min-height: 100vh;
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+/* Smooth transitions */
+a, button {
+  transition: all 0.2s ease;
 }
 
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #D1D5DB;
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #9CA3AF;
-}
-
-/* Subtle animations */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.3s ease-out;
+/* Focus states */
+input:focus, button:focus {
+  outline: none;
 }
