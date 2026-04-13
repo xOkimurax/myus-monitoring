@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { Outlet, Link, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import { useWebSocket } from '../../hooks/useWebSocket';
 import {
   LayoutDashboard,
   Bell,
@@ -42,45 +41,45 @@ export const Sidebar = () => {
 
   return (
     <aside
-      className={`fixed left-0 top-0 h-screen bg-white border-r border-gray-200 transition-all duration-300 z-50 ${
-        collapsed ? 'w-20' : 'w-64'
+      className={`fixed left-0 top-0 h-screen bg-white border-r-2 border-gray-100 transition-all duration-300 z-50 shadow-xl ${
+        collapsed ? 'w-24' : 'w-72'
       }`}
     >
       <div className="flex flex-col h-full">
         {/* Logo */}
-        <div className={`p-5 border-b border-gray-100 flex items-center ${collapsed ? 'justify-center' : 'justify-between'}`}>
+        <div className={`p-6 border-b-2 border-gray-100 flex items-center ${collapsed ? 'justify-center' : 'justify-between'}`}>
           {!collapsed && (
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-[#5B5FC7] rounded-xl flex items-center justify-center shadow-lg shadow-indigo-100">
-                <span className="text-white font-semibold text-base">M</span>
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-[#5B5FC7] rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-200">
+                <span className="text-white font-bold text-xl">M</span>
               </div>
-              <span className="font-semibold text-[#1F2937] text-xl">Myus</span>
+              <span className="font-bold text-2xl text-[#1F2937]">Myus</span>
             </div>
           )}
           {collapsed && (
-            <div className="w-10 h-10 bg-[#5B5FC7] rounded-xl flex items-center justify-center shadow-lg shadow-indigo-100">
-              <span className="text-white font-semibold text-base">M</span>
+            <div className="w-12 h-12 bg-[#5B5FC7] rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-200">
+              <span className="text-white font-bold text-xl">M</span>
             </div>
           )}
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-4 overflow-y-auto">
-          <ul className="space-y-2">
+        <nav className="flex-1 p-5 overflow-y-auto">
+          <ul className="space-y-3">
             {navItems.map((item) => {
               const isActive = location.pathname === item.path;
               return (
                 <li key={item.path}>
                   <Link
                     to={item.path}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                    className={`flex items-center gap-4 px-5 py-4 rounded-2xl transition-all font-medium text-lg ${
                       isActive
-                        ? 'bg-[#5B5FC7] text-white shadow-lg shadow-indigo-100'
+                        ? 'bg-[#5B5FC7] text-white shadow-lg shadow-indigo-200'
                         : 'text-[#6B7280] hover:bg-gray-50 hover:text-[#1F2937]'
                     }`}
                   >
-                    <item.icon size={20} />
-                    {!collapsed && <span className="font-medium text-sm">{item.label}</span>}
+                    <item.icon size={24} />
+                    {!collapsed && <span>{item.label}</span>}
                   </Link>
                 </li>
               );
@@ -88,36 +87,38 @@ export const Sidebar = () => {
           </ul>
         </nav>
 
-        {/* Connection Status */}
-        <div className={`px-4 pb-4 border-t border-gray-100 pt-4 ${collapsed ? 'text-center' : ''}`}>
-          <div className={`flex items-center gap-2 text-xs text-[#9CA3AF] ${collapsed ? 'justify-center' : ''}`}>
-            <div className="w-2 h-2 bg-[#10B981] rounded-full animate-pulse" />
-            {!collapsed && <span>Sync: {formatLastSync()}</span>}
+        {/* Sync Status */}
+        {!collapsed && (
+          <div className="px-6 py-4 border-t-2 border-gray-100">
+            <div className="flex items-center gap-3 text-sm text-[#9CA3AF]">
+              <div className="w-3 h-3 bg-[#10B981] rounded-full animate-pulse" />
+              <span>Sincronizado: {formatLastSync()}</span>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* User & Logout */}
-        <div className="p-4 border-t border-gray-100">
+        <div className="p-5 border-t-2 border-gray-100">
           {!collapsed && user && (
-            <div className="mb-3 text-sm text-[#6B7280] truncate text-center">
+            <div className="mb-4 text-base text-[#6B7280] truncate text-center font-medium">
               {user.email}
             </div>
           )}
           <button
             onClick={logout}
-            className={`flex items-center gap-2 w-full px-4 py-3 text-[#6B7280] hover:bg-red-50 hover:text-red-600 rounded-xl transition-all text-sm font-medium ${collapsed ? 'justify-center' : ''}`}
+            className={`flex items-center gap-3 w-full px-5 py-4 text-[#6B7280] hover:bg-red-50 hover:text-red-600 rounded-2xl transition-all font-medium text-lg ${collapsed ? 'justify-center' : ''}`}
           >
-            <LogOut size={18} />
-            {!collapsed && <span>Cerrar</span>}
+            <LogOut size={24} />
+            {!collapsed && <span>Cerrar sesión</span>}
           </button>
         </div>
 
         {/* Collapse Toggle */}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="absolute -right-3 top-20 w-7 h-7 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+          className="absolute -right-4 top-28 w-8 h-8 bg-white border-2 border-gray-200 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all cursor-pointer"
         >
-          {collapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+          {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
         </button>
       </div>
     </aside>
@@ -128,8 +129,8 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="min-h-screen bg-[#FAFBFC]">
       <Sidebar />
-      <main className="ml-64 min-h-screen p-6 lg:p-8">
-        <div className="max-w-6xl mx-auto animate-fade-in">
+      <main className="ml-72 min-h-screen p-10">
+        <div className="max-w-7xl mx-auto animate-fade-in">
           {children}
         </div>
       </main>
