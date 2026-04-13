@@ -58,11 +58,11 @@ export const DashboardPage = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-[#1A202C]">Dashboard</h1>
-          <p className="text-sm text-[#9CA3AF] mt-1">Dispositivo: {selectedDevice?.deviceName || 'No seleccionado'}</p>
+          <p className="text-sm text-[#A0AEC0] mt-1">Dispositivo: {selectedDevice?.deviceName || 'No seleccionado'}</p>
         </div>
-        <div className="flex items-center gap-2 bg-white px-4 py-2.5 rounded-lg border border-[#E2E8F0]">
-          <Activity size={14} className="text-[#48BB78]" />
-          <span className="text-xs text-[#9CA3AF]">Monitoreo activo</span>
+        <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg border border-[#EDF2F7]">
+          <Activity size={12} className="text-[#48BB78]" />
+          <span className="text-xs text-[#A0AEC0]">Monitoreo activo</span>
         </div>
       </div>
 
@@ -73,7 +73,7 @@ export const DashboardPage = () => {
             key={action.path}
             title={action.label}
             value={action.count}
-            icon={<action.icon size={20} />}
+            icon={<action.icon size={18} />}
             color={action.color}
           />
         ))}
@@ -86,13 +86,13 @@ export const DashboardPage = () => {
             <Link
               key={action.path}
               to={action.path}
-              className="flex flex-col items-center p-6 bg-[#F5F7FA] rounded-xl border border-[#E2E8F0] hover:border-[#5B5FC7] hover:shadow-md transition-all text-center"
+              className="flex flex-col items-center p-8 bg-[#F8FAFC] rounded-xl border border-[#EDF2F7] hover:border-[#5B5FC7] transition-all text-center"
             >
               <div
                 className="p-3 rounded-lg mb-4"
                 style={{ backgroundColor: `${colorMap[action.color]}15` }}
               >
-                <action.icon size={22} style={{ color: colorMap[action.color] }} />
+                <action.icon size={20} style={{ color: colorMap[action.color] }} />
               </div>
               <span className="font-medium text-sm text-[#1A202C]">{action.label}</span>
               <span className="text-xs text-[#A0AEC0] mt-1">{action.count} registros</span>
@@ -109,9 +109,9 @@ export const DashboardPage = () => {
             { icon: MapPin, color: '#48BB78', title: 'Ubicación actualizada', desc: 'Hace 10 minutos' },
             { icon: Phone, color: '#ED8936', title: 'Llamada registrada', desc: 'Llamada entrante - Hace 30 min' },
           ].map((item, i) => (
-            <div key={i} className="flex items-center gap-4 p-4 bg-[#F5F7FA] rounded-lg">
-              <div className="p-2.5 rounded-lg" style={{ backgroundColor: `${item.color}15` }}>
-                <item.icon size={16} style={{ color: item.color }} />
+            <div key={i} className="flex items-center gap-4 p-4 bg-[#F8FAFC] rounded-xl">
+              <div className="p-2 rounded-lg" style={{ backgroundColor: `${item.color}15` }}>
+                <item.icon size={14} style={{ color: item.color }} />
               </div>
               <div className="flex-1">
                 <p className="text-sm font-medium text-[#1A202C]">{item.title}</p>
