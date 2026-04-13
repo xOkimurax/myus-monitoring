@@ -1,0 +1,54 @@
+name: myus_mobile
+description: "Myus - Mobile Monitoring Application (AirDroid clone)"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+
+  # State Management
+  flutter_bloc: ^8.1.6
+  equatable: ^2.0.7
+
+  # Dependency Injection
+  get_it: ^8.0.3
+  injectable: ^2.5.0
+
+  # Network & API
+  dio: ^5.7.0
+  socket_io_client: ^3.0.2
+
+  # Local Storage
+  shared_preferences: ^2.3.4
+  flutter_secure_storage: ^9.2.4
+
+  # Permissions
+  permission_handler: ^11.3.1
+
+  # Background Services
+  workmanager: ^0.5.2
+
+  # Location
+  geolocator: ^13.0.2
+
+  # Utilities
+  dartz: ^0.10.1
+  json_annotation: ^4.9.0
+  intl: ^0.20.2
+  uuid: ^4.5.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  build_runner: ^2.4.14
+  injectable_generator: ^2.6.3
+  json_serializable: ^6.9.4
+
+flutter:
+  uses-material-design: true

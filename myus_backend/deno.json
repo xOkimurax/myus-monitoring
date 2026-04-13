@@ -1,0 +1,10 @@
+{
+  "name": "myus-backend",
+  "version": "1.0.0",
+  "description": "Backend Edge Functions for Myus Monitoring System",
+  "main": "deno.json",
+  "scripts": {
+    "deploy": "npx @insforge/cli functions deploy",
+    "dev": "npx @insforge/cli functions dev"
+  }
+}
