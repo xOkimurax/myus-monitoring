@@ -53,27 +53,27 @@ export const DashboardPage = () => {
   };
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-12">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-[#1A202C]">Dashboard</h1>
-          <p className="text-[#718096] mt-2">Dispositivo: {selectedDevice?.deviceName || 'No seleccionado'}</p>
+          <h1 className="text-4xl font-bold text-[#1A202C]">Dashboard</h1>
+          <p className="text-[#718096] mt-3 text-lg">Dispositivo: {selectedDevice?.deviceName || 'No seleccionado'}</p>
         </div>
-        <div className="flex items-center gap-3 bg-white px-5 py-3 rounded-xl border border-[#E2E8F0]">
-          <Activity size={18} className="text-[#48BB78]" />
-          <span className="text-sm font-medium text-[#718096]">Monitoreo activo</span>
+        <div className="flex items-center gap-3 bg-white px-6 py-4 rounded-2xl border border-[#E2E8F0]">
+          <Activity size={20} className="text-[#48BB78]" />
+          <span className="text-base font-medium text-[#718096]">Monitoreo activo</span>
         </div>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
         {quickActions.map((action) => (
           <StatCard
             key={action.path}
             title={action.label}
             value={action.count}
-            icon={<action.icon size={24} />}
+            icon={<action.icon size={28} />}
             color={action.color}
           />
         ))}
@@ -81,21 +81,21 @@ export const DashboardPage = () => {
 
       {/* Quick Actions */}
       <Card title="Acciones Rápidas">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
           {quickActions.map((action) => (
             <Link
               key={action.path}
               to={action.path}
-              className="flex flex-col items-center p-8 bg-[#F5F7FA] rounded-2xl border border-[#E2E8F0] hover:border-[#5B5FC7] hover:shadow-lg transition-all text-center"
+              className="flex flex-col items-center p-10 bg-[#F5F7FA] rounded-2xl border border-[#E2E8F0] hover:border-[#5B5FC7] hover:shadow-xl transition-all text-center"
             >
               <div
-                className="p-4 rounded-2xl mb-5"
+                className="p-5 rounded-2xl mb-6"
                 style={{ backgroundColor: `${colorMap[action.color]}15` }}
               >
-                <action.icon size={28} style={{ color: colorMap[action.color] }} />
+                <action.icon size={32} style={{ color: colorMap[action.color] }} />
               </div>
-              <span className="font-semibold text-[#1A202C] text-lg">{action.label}</span>
-              <span className="text-sm text-[#A0AEC0] mt-2">{action.count} registros</span>
+              <span className="font-semibold text-[#1A202C] text-xl">{action.label}</span>
+              <span className="text-base text-[#A0AEC0] mt-3">{action.count} registros</span>
             </Link>
           ))}
         </div>
@@ -103,19 +103,19 @@ export const DashboardPage = () => {
 
       {/* Recent Activity */}
       <Card title="Actividad Reciente">
-        <div className="space-y-4">
+        <div className="space-y-5">
           {[
             { icon: Bell, color: '#5B5FC7', title: 'Nueva notificación', desc: 'WhatsApp - Hace 5 minutos' },
             { icon: MapPin, color: '#48BB78', title: 'Ubicación actualizada', desc: 'Hace 10 minutos' },
             { icon: Phone, color: '#ED8936', title: 'Llamada registrada', desc: 'Llamada entrante - Hace 30 min' },
           ].map((item, i) => (
-            <div key={i} className="flex items-center gap-5 p-5 bg-[#F5F7FA] rounded-2xl">
-              <div className="p-4 rounded-xl" style={{ backgroundColor: `${item.color}15` }}>
-                <item.icon size={20} style={{ color: item.color }} />
+            <div key={i} className="flex items-center gap-6 p-6 bg-[#F5F7FA] rounded-2xl">
+              <div className="p-4 rounded-2xl" style={{ backgroundColor: `${item.color}15` }}>
+                <item.icon size={22} style={{ color: item.color }} />
               </div>
               <div className="flex-1">
-                <p className="font-medium text-[#1A202C]">{item.title}</p>
-                <p className="text-sm text-[#A0AEC0] mt-1">{item.desc}</p>
+                <p className="font-semibold text-[#1A202C] text-lg">{item.title}</p>
+                <p className="text-base text-[#A0AEC0] mt-1">{item.desc}</p>
               </div>
             </div>
           ))}
