@@ -13,8 +13,6 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
-  Wifi,
-  WifiOff,
 } from 'lucide-react';
 import { useMonitoringStore } from '../../store/monitoringStore';
 
@@ -44,7 +42,7 @@ export const Sidebar = () => {
 
   return (
     <aside
-      className={`fixed left-0 top-0 h-screen bg-white border-r border-gray-200 transition-all duration-300 ${
+      className={`fixed left-0 top-0 h-screen bg-white border-r border-gray-200 transition-all duration-300 z-50 ${
         collapsed ? 'w-20' : 'w-64'
       }`}
     >
@@ -53,22 +51,22 @@ export const Sidebar = () => {
         <div className={`p-5 border-b border-gray-100 flex items-center ${collapsed ? 'justify-center' : 'justify-between'}`}>
           {!collapsed && (
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 bg-[#5B5FC7] rounded-xl flex items-center justify-center shadow-lg shadow-indigo-100">
-                <span className="text-white font-semibold text-sm">M</span>
+              <div className="w-10 h-10 bg-[#5B5FC7] rounded-xl flex items-center justify-center shadow-lg shadow-indigo-100">
+                <span className="text-white font-semibold text-base">M</span>
               </div>
-              <span className="font-semibold text-[#1F2937] text-lg">Myus</span>
+              <span className="font-semibold text-[#1F2937] text-xl">Myus</span>
             </div>
           )}
           {collapsed && (
-            <div className="w-9 h-9 bg-[#5B5FC7] rounded-xl flex items-center justify-center shadow-lg shadow-indigo-100">
-              <span className="text-white font-semibold text-sm">M</span>
+            <div className="w-10 h-10 bg-[#5B5FC7] rounded-xl flex items-center justify-center shadow-lg shadow-indigo-100">
+              <span className="text-white font-semibold text-base">M</span>
             </div>
           )}
         </div>
 
         {/* Navigation */}
         <nav className="flex-1 p-4 overflow-y-auto">
-          <ul className="space-y-1">
+          <ul className="space-y-2">
             {navItems.map((item) => {
               const isActive = location.pathname === item.path;
               return (
@@ -107,7 +105,7 @@ export const Sidebar = () => {
           )}
           <button
             onClick={logout}
-            className={`flex items-center gap-2 w-full px-4 py-2.5 text-[#6B7280] hover:bg-red-50 hover:text-red-600 rounded-xl transition-all text-sm ${collapsed ? 'justify-center' : ''}`}
+            className={`flex items-center gap-2 w-full px-4 py-3 text-[#6B7280] hover:bg-red-50 hover:text-red-600 rounded-xl transition-all text-sm font-medium ${collapsed ? 'justify-center' : ''}`}
           >
             <LogOut size={18} />
             {!collapsed && <span>Cerrar</span>}
@@ -117,7 +115,7 @@ export const Sidebar = () => {
         {/* Collapse Toggle */}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="absolute -right-3 top-20 w-6 h-6 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-sm hover:shadow-md transition-shadow"
+          className="absolute -right-3 top-20 w-7 h-7 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-sm hover:shadow-md transition-shadow cursor-pointer"
         >
           {collapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
         </button>
@@ -130,7 +128,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="min-h-screen bg-[#FAFBFC]">
       <Sidebar />
-      <main className="ml-64 min-h-screen p-8">
+      <main className="ml-64 min-h-screen p-6 lg:p-8">
         <div className="max-w-6xl mx-auto animate-fade-in">
           {children}
         </div>

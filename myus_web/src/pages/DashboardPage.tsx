@@ -7,7 +7,6 @@ import {
   Phone,
   MapPin,
   Folder,
-  TrendingUp,
   Clock,
   Activity,
   AlertCircle,
@@ -18,7 +17,7 @@ import { useAuthStore } from '../store/authStore';
 import { notificationsApi, contactsApi, callLogsApi, locationsApi } from '../api/endpoints';
 
 export const DashboardPage = () => {
-  const { selectedDevice, setNotifications, setContacts, setCallLogs, setLocations, setDevices } = useMonitoringStore();
+  const { selectedDevice, setNotifications, setContacts, setCallLogs, setLocations } = useMonitoringStore();
   const { user } = useAuthStore();
   const [stats, setStats] = useState({
     totalNotifications: 0,
@@ -32,7 +31,6 @@ export const DashboardPage = () => {
       if (!user?.deviceId) return;
 
       try {
-        // Fetch all data in parallel
         const [notifications, contacts, calls, locations] = await Promise.all([
           notificationsApi.getAll(user.deviceId).catch(() => ({ data: [] })),
           contactsApi.getAll(user.deviceId).catch(() => ({ data: [] })),
@@ -66,31 +64,24 @@ export const DashboardPage = () => {
     { label: 'Ubicación', icon: MapPin, path: '/locations', color: 'error', count: stats.locationUpdates },
   ];
 
-  const colorMap: Record<string, string> = {
-    primary: 'bg-primary',
-    secondary: 'bg-secondary',
-    warning: 'bg-warning',
-    error: 'bg-error',
-  };
-
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Dashboard</h1>
-          <p className="text-gray-400 mt-1">
+          <h1 className="text-3xl font-bold text-[#1F2937]">Dashboard</h1>
+          <p className="text-[#6B7280] mt-1">
             Dispositivo: {selectedDevice?.deviceName || 'No seleccionado'}
           </p>
         </div>
-        <div className="flex items-center gap-2 text-sm text-gray-400">
-          <Activity size={16} className="text-success" />
+        <div className="flex items-center gap-2 text-sm text-[#6B7280] bg-white px-4 py-2 rounded-xl border border-gray-200">
+          <Activity size={16} className="text-[#10B981]" />
           <span>Monitoreo activo</span>
         </div>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
           title="Notificaciones"
           value={stats.totalNotifications}
@@ -119,18 +110,18 @@ export const DashboardPage = () => {
 
       {/* Quick Actions */}
       <Card title="Acciones Rápidas" icon={<LayoutDashboard size={20} />}>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {quickActions.map((action) => (
             <Link
               key={action.path}
               to={action.path}
-              className="flex flex-col items-center p-4 bg-background rounded-lg border border-gray-700 hover:border-primary transition-colors"
+              className="flex flex-col items-center p-6 bg-[#FAFBFC] rounded-xl border border-gray-200 hover:border-[#5B5FC7] hover:shadow-lg transition-all text-center"
             >
-              <div className={`p-3 rounded-lg ${colorMap[action.color]}/10 mb-3`}>
-                <action.icon size={24} className={`text-${action.color}`} />
+              <div className={`p-3 rounded-xl mb-4`} style={{ backgroundColor: `${action.color === 'primary' ? '#5B5FC7' : action.color === 'secondary' ? '#7DD3C0' : action.color === 'warning' ? '#F59E0B' : '#EF4444'}15` }}>
+                <action.icon size={24} style={{ color: action.color === 'primary' ? '#5B5FC7' : action.color === 'secondary' ? '#7DD3C0' : action.color === 'warning' ? '#F59E0B' : '#EF4444' }} />
               </div>
-              <span className="font-medium">{action.label}</span>
-              <span className="text-sm text-gray-400 mt-1">{action.count} registros</span>
+              <span className="font-semibold text-[#1F2937]">{action.label}</span>
+              <span className="text-sm text-[#9CA3AF] mt-1">{action.count} registros</span>
             </Link>
           ))}
         </div>
@@ -141,31 +132,31 @@ export const DashboardPage = () => {
         {/* Recent Activity */}
         <Card title="Actividad Reciente" icon={<Clock size={20} />}>
           <div className="space-y-4">
-            <div className="flex items-center gap-3 p-3 bg-background rounded-lg">
-              <div className="p-2 bg-primary/10 rounded-lg">
-                <Bell size={16} className="text-primary" />
+            <div className="flex items-center gap-4 p-4 bg-[#FAFBFC] rounded-xl">
+              <div className="p-3 bg-[#5B5FC7]/10 rounded-xl">
+                <Bell size={18} className="text-[#5B5FC7]" />
               </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium">Nueva notificación</p>
-                <p className="text-xs text-gray-400">WhatsApp - Hace 5 minutos</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 p-3 bg-background rounded-lg">
-              <div className="p-2 bg-secondary/10 rounded-lg">
-                <MapPin size={16} className="text-secondary" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium">Ubicación actualizada</p>
-                <p className="text-xs text-gray-400">Hace 10 minutos</p>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-[#1F2937]">Nueva notificación</p>
+                <p className="text-xs text-[#9CA3AF] mt-0.5">WhatsApp - Hace 5 minutos</p>
               </div>
             </div>
-            <div className="flex items-center gap-3 p-3 bg-background rounded-lg">
-              <div className="p-2 bg-warning/10 rounded-lg">
-                <Phone size={16} className="text-warning" />
+            <div className="flex items-center gap-4 p-4 bg-[#FAFBFC] rounded-xl">
+              <div className="p-3 bg-[#7DD3C0]/10 rounded-xl">
+                <MapPin size={18} className="text-[#7DD3C0]" />
               </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium">Llamada registrada</p>
-                <p className="text-xs text-gray-400">Llamada entrante - Hace 30 minutos</p>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-[#1F2937]">Ubicación actualizada</p>
+                <p className="text-xs text-[#9CA3AF] mt-0.5">Hace 10 minutos</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4 p-4 bg-[#FAFBFC] rounded-xl">
+              <div className="p-3 bg-[#F59E0B]/10 rounded-xl">
+                <Phone size={18} className="text-[#F59E0B]" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-[#1F2937]">Llamada registrada</p>
+                <p className="text-xs text-[#9CA3AF] mt-0.5">Llamada entrante - Hace 30 minutos</p>
               </div>
             </div>
           </div>
@@ -174,33 +165,33 @@ export const DashboardPage = () => {
         {/* System Status */}
         <Card title="Estado del Sistema" icon={<AlertCircle size={20} />}>
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-3 bg-background rounded-lg">
+            <div className="flex items-center justify-between p-4 bg-[#FAFBFC] rounded-xl">
               <div className="flex items-center gap-3">
-                <div className="w-3 h-3 bg-success rounded-full" />
-                <span>API Insforge</span>
+                <div className="w-3 h-3 bg-[#10B981] rounded-full" />
+                <span className="text-sm text-[#1F2937]">API Insforge</span>
               </div>
-              <span className="text-sm text-success">Operativo</span>
+              <span className="text-sm text-[#10B981] font-medium">Operativo</span>
             </div>
-            <div className="flex items-center justify-between p-3 bg-background rounded-lg">
+            <div className="flex items-center justify-between p-4 bg-[#FAFBFC] rounded-xl">
               <div className="flex items-center gap-3">
-                <div className="w-3 h-3 bg-success rounded-full" />
-                <span>WebSocket</span>
+                <div className="w-3 h-3 bg-[#10B981] rounded-full" />
+                <span className="text-sm text-[#1F2937]">WebSocket</span>
               </div>
-              <span className="text-sm text-success">Conectado</span>
+              <span className="text-sm text-[#10B981] font-medium">Conectado</span>
             </div>
-            <div className="flex items-center justify-between p-3 bg-background rounded-lg">
+            <div className="flex items-center justify-between p-4 bg-[#FAFBFC] rounded-xl">
               <div className="flex items-center gap-3">
-                <div className="w-3 h-3 bg-success rounded-full" />
-                <span>Sincronización</span>
+                <div className="w-3 h-3 bg-[#10B981] rounded-full" />
+                <span className="text-sm text-[#1F2937]">Sincronización</span>
               </div>
-              <span className="text-sm text-gray-400">Hace 5 min</span>
+              <span className="text-sm text-[#6B7280]">Hace 5 min</span>
             </div>
-            <div className="flex items-center justify-between p-3 bg-background rounded-lg">
+            <div className="flex items-center justify-between p-4 bg-[#FAFBFC] rounded-xl">
               <div className="flex items-center gap-3">
-                <div className="w-3 h-3 bg-warning rounded-full" />
-                <span>Batería dispositivo</span>
+                <div className="w-3 h-3 bg-[#F59E0B] rounded-full" />
+                <span className="text-sm text-[#1F2937]">Batería dispositivo</span>
               </div>
-              <span className="text-sm text-warning">45%</span>
+              <span className="text-sm text-[#F59E0B] font-medium">45%</span>
             </div>
           </div>
         </Card>
