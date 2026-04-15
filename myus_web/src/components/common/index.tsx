@@ -10,17 +10,19 @@ interface CardProps {
 
 export const Card = ({ title, children, icon, action, className = '' }: CardProps) => {
   return (
-    <div className={`bg-white rounded-xl border border-[#EDF2F7] p-6 ${className}`}>
+    <div className={`bg-surface rounded-xl border border-border ${className}`}>
       {(title || icon || action) && (
-        <div className="flex items-center justify-between mb-5 pb-4 border-b border-[#EDF2F7]">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border">
           <div className="flex items-center gap-3">
-            {icon && <span className="text-[#5B5FC7]">{icon}</span>}
-            {title && <h3 className="font-medium text-sm text-[#1A202C]">{title}</h3>}
+            {icon && <span className="text-primary">{icon}</span>}
+            {title && <h3 className="font-semibold text-sm text-text-primary">{title}</h3>}
           </div>
           {action}
         </div>
       )}
-      {children}
+      <div className="p-5">
+        {children}
+      </div>
     </div>
   );
 };
@@ -34,20 +36,20 @@ interface StatCardProps {
 
 export const StatCard = ({ title, value, icon, color = 'primary' }: StatCardProps) => {
   const colors: Record<string, { bg: string; text: string }> = {
-    primary: { bg: 'bg-[#5B5FC7]/10', text: 'text-[#5B5FC7]' },
-    secondary: { bg: 'bg-[#48BB78]/10', text: 'text-[#48BB78]' },
-    warning: { bg: 'bg-[#ED8936]/10', text: 'text-[#ED8936]' },
-    error: { bg: 'bg-[#E53E3E]/10', text: 'text-[#E53E3E]' },
+    primary: { bg: 'bg-primary/15', text: 'text-primary' },
+    secondary: { bg: 'bg-secondary/15', text: 'text-secondary' },
+    warning: { bg: 'bg-warning/15', text: 'text-warning' },
+    error: { bg: 'bg-error/15', text: 'text-error' },
   };
 
   const c = colors[color] || colors.primary;
 
   return (
-    <div className="bg-white rounded-xl border border-[#EDF2F7] p-5">
+    <div className="bg-surface rounded-xl border border-border p-5">
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-xs text-[#A0AEC0] mb-1">{title}</p>
-          <p className="text-2xl font-bold text-[#1A202C]">{value}</p>
+          <p className="text-xs text-text-muted mb-1 font-medium uppercase tracking-wide">{title}</p>
+          <p className="text-2xl font-bold text-text-primary">{value}</p>
         </div>
         <div className={`p-3 rounded-lg ${c.bg}`}>
           <span className={c.text}>{icon}</span>
@@ -67,28 +69,36 @@ interface DataTableProps<T> {
 
 export function DataTable<T>({ columns, data, keyExtractor, emptyMessage = 'Sin datos', loading = false }: DataTableProps<T>) {
   if (loading) {
-    return <div className="flex items-center justify-center py-10"><div className="w-8 h-8 border-3 border-[#5B5FC7] border-t-transparent rounded-full animate-spin" /></div>;
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="w-8 h-8 border-[3px] border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
   }
 
   if (data.length === 0) {
-    return <div className="text-center py-10 text-[#A0AEC0] text-sm">{emptyMessage}</div>;
+    return (
+      <div className="text-center py-12 text-text-muted text-sm">{emptyMessage}</div>
+    );
   }
 
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto rounded-lg border border-border">
       <table className="w-full">
         <thead>
-          <tr className="border-b border-[#EDF2F7]">
+          <tr className="bg-background">
             {columns.map((col) => (
-              <th key={col.key} className="text-left py-3 px-4 text-xs font-medium text-[#A0AEC0] uppercase">{col.label}</th>
+              <th key={col.key} className="text-left py-3 px-4 text-xs font-semibold text-text-muted uppercase tracking-wider">
+                {col.label}
+              </th>
             ))}
           </tr>
         </thead>
         <tbody>
           {data.map((item) => (
-            <tr key={keyExtractor(item)} className="border-b border-[#EDF2F7] hover:bg-[#F8FAFC] transition-colors">
+            <tr key={keyExtractor(item)} className="border-t border-border hover:bg-background/50 transition-colors">
               {columns.map((col) => (
-                <td key={col.key} className="py-3.5 px-4 text-sm text-[#4A5568]">
+                <td key={col.key} className="py-3.5 px-4 text-sm text-text-secondary">
                   {col.render ? col.render(item) : String((item as Record<string, unknown>)[col.key] ?? '')}
                 </td>
               ))}
@@ -101,15 +111,18 @@ export function DataTable<T>({ columns, data, keyExtractor, emptyMessage = 'Sin 
 }
 
 export const LoadingSpinner = ({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) => {
-  const sizes = { sm: 'w-4 h-4', md: 'w-8 h-8', lg: 'w-10 h-10' };
-  return <div className={`animate-spin rounded-full border-3 border-[#5B5FC7] border-t-transparent ${sizes[size]}`} />;
+  const sizes = { sm: 'w-4 h-4', md: 'w-8 h-8', lg: 'w-12 h-12' };
+  const borders = { sm: 'border-2', md: 'border-[3px]', lg: 'border-4' };
+  return (
+    <div className={`animate-spin rounded-full border-primary border-t-transparent ${sizes[size]} ${borders[size]}`} />
+  );
 };
 
 export const EmptyState = ({ icon, title, description, action }: { icon: ReactNode; title: string; description?: string; action?: ReactNode }) => (
-  <div className="flex flex-col items-center justify-center py-10 text-center">
-    <div className="text-[#CBD5E0] mb-3">{icon}</div>
-    <h3 className="text-sm font-medium text-[#4A5568] mb-1">{title}</h3>
-    {description && <p className="text-xs text-[#A0AEC0] mb-4">{description}</p>}
+  <div className="flex flex-col items-center justify-center py-16 text-center">
+    <div className="text-text-muted mb-4 opacity-40">{icon}</div>
+    <h3 className="text-sm font-semibold text-text-secondary mb-1">{title}</h3>
+    {description && <p className="text-xs text-text-muted mb-5 max-w-xs">{description}</p>}
     {action}
   </div>
 );

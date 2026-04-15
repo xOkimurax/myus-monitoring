@@ -51,14 +51,14 @@ export const ContactsPage = () => {
       label: 'Nombre',
       render: (item: Contact) => (
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+          <div className="w-9 h-9 rounded-full bg-primary/15 flex items-center justify-center flex-shrink-0">
             {item.photoUri ? (
               <img src={item.photoUri} alt={item.name} className="w-full h-full rounded-full object-cover" />
             ) : (
-              <User size={20} className="text-primary" />
+              <User size={18} className="text-primary" />
             )}
           </div>
-          <span className="font-medium">{item.name}</span>
+          <span className="font-medium text-text-primary">{item.name}</span>
         </div>
       ),
     },
@@ -68,14 +68,14 @@ export const ContactsPage = () => {
       render: (item: Contact) => (
         <div className="space-y-1">
           {item.phoneNumbers.slice(0, 2).map((phone, i) => (
-            <div key={i} className="flex items-center gap-2 text-sm">
-              <Phone size={14} className="text-gray-500" />
+            <div key={i} className="flex items-center gap-2 text-sm text-text-secondary">
+              <Phone size={13} className="text-text-muted" />
               <span>{phone.number}</span>
-              <span className="text-xs text-gray-500">({phone.type})</span>
+              <span className="text-xs text-text-muted">({phone.type})</span>
             </div>
           ))}
           {item.phoneNumbers.length > 2 && (
-            <span className="text-xs text-gray-400">+{item.phoneNumbers.length - 2} más</span>
+            <span className="text-xs text-text-muted">+{item.phoneNumbers.length - 2} más</span>
           )}
         </div>
       ),
@@ -86,9 +86,9 @@ export const ContactsPage = () => {
       render: (item: Contact) => (
         <div className="space-y-1">
           {item.emails.slice(0, 2).map((email, i) => (
-            <div key={i} className="flex items-center gap-2 text-sm">
-              <Mail size={14} className="text-gray-500" />
-              <span className="truncate max-w-xs">{email.email}</span>
+            <div key={i} className="flex items-center gap-2 text-sm text-text-secondary">
+              <Mail size={13} className="text-text-muted" />
+              <span className="truncate max-w-[200px]">{email.email}</span>
             </div>
           ))}
         </div>
@@ -100,7 +100,7 @@ export const ContactsPage = () => {
       render: (item: Contact) => (
         <button
           onClick={() => handleDelete(item.id)}
-          className="p-2 text-gray-400 hover:text-error hover:bg-error/10 rounded-lg transition-colors"
+          className="p-2 text-text-muted hover:text-error hover:bg-error/10 rounded-lg transition-colors"
         >
           <Trash2 size={16} />
         </button>
@@ -113,39 +113,37 @@ export const ContactsPage = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Contactos</h1>
-          <p className="text-gray-400 mt-1">{contacts.length} contactos sincronizados</p>
+          <h1 className="text-2xl font-bold text-text-primary">Contactos</h1>
+          <p className="text-sm text-text-muted mt-1">{contacts.length} contactos sincronizados</p>
         </div>
         <button
           onClick={fetchContacts}
-          className="flex items-center gap-2 px-4 py-2 bg-surface border border-gray-700 rounded-lg hover:bg-gray-700 transition-colors"
+          className="flex items-center gap-2 px-4 py-2.5 bg-primary hover:bg-primary-dark text-white rounded-xl transition-colors font-medium text-sm shadow-lg shadow-primary/25"
         >
-          <RefreshCw size={18} />
+          <RefreshCw size={16} />
           Sincronizar
         </button>
       </div>
 
       {/* Search */}
-      <Card>
-        <div className="relative">
-          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
-          <input
-            type="text"
-            placeholder="Buscar por nombre, teléfono o email..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-background border border-gray-700 rounded-lg py-2.5 pl-10 pr-4 text-white placeholder-gray-500 focus:border-primary focus:outline-none"
-          />
-        </div>
-      </Card>
+      <div className="relative">
+        <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" />
+        <input
+          type="text"
+          placeholder="Buscar por nombre, teléfono o email..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full bg-surface border border-border rounded-xl py-3 pl-11 pr-4 text-sm text-text-primary placeholder-text-muted focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+        />
+      </div>
 
       {/* Data Table */}
-      <Card>
-        {isLoading.contacts ? (
-          <div className="flex items-center justify-center py-12">
-            <LoadingSpinner size="lg" />
-          </div>
-        ) : errors.contacts ? (
+      {isLoading.contacts ? (
+        <div className="flex items-center justify-center py-16 bg-surface rounded-xl border border-border">
+          <LoadingSpinner size="lg" />
+        </div>
+      ) : errors.contacts ? (
+        <Card>
           <EmptyState
             icon={<User size={48} />}
             title="Error al cargar"
@@ -153,21 +151,23 @@ export const ContactsPage = () => {
             action={
               <button
                 onClick={fetchContacts}
-                className="px-4 py-2 bg-primary text-white rounded-lg"
+                className="px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-medium"
               >
                 Reintentar
               </button>
             }
           />
-        ) : (
+        </Card>
+      ) : (
+        <Card className="p-0">
           <DataTable
             columns={columns}
             data={filteredContacts}
             keyExtractor={(item) => item.id}
-            emptyMessage="No hay contactos"
+            emptyMessage="No hay contactos que coincidan"
           />
-        )}
-      </Card>
+        </Card>
+      )}
     </div>
   );
 };

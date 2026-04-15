@@ -57,25 +57,14 @@ export const CallsPage = () => {
     });
   };
 
-  const getCallIcon = (type: string) => {
+  const getCallInfo = (type: string) => {
     switch (type) {
       case 'INCOMING':
-        return <ArrowDownLeft size={16} className="text-success" />;
+        return { icon: <ArrowDownLeft size={15} className="text-secondary" />, bg: 'bg-secondary/15', text: 'text-secondary', label: 'Entrante' };
       case 'OUTGOING':
-        return <ArrowUpRight size={16} className="text-primary" />;
+        return { icon: <ArrowUpRight size={15} className="text-primary" />, bg: 'bg-primary/15', text: 'text-primary', label: 'Saliente' };
       default:
-        return <XCircle size={16} className="text-error" />;
-    }
-  };
-
-  const getCallTypeLabel = (type: string) => {
-    switch (type) {
-      case 'INCOMING':
-        return 'Entrante';
-      case 'OUTGOING':
-        return 'Saliente';
-      default:
-        return 'Perdida';
+        return { icon: <XCircle size={15} className="text-error" />, bg: 'bg-error/15', text: 'text-error', label: 'Perdida' };
     }
   };
 
@@ -91,30 +80,23 @@ export const CallsPage = () => {
     {
       key: 'type',
       label: 'Tipo',
-      render: (item: CallLog) => (
-        <div className="flex items-center gap-2">
-          <div className={`p-2 rounded-lg ${
-            item.type === 'INCOMING' ? 'bg-success/10' :
-            item.type === 'OUTGOING' ? 'bg-primary/10' : 'bg-error/10'
-          }`}>
-            {getCallIcon(item.type)}
+      render: (item: CallLog) => {
+        const info = getCallInfo(item.type);
+        return (
+          <div className="flex items-center gap-2.5">
+            <div className={`p-1.5 rounded-lg ${info.bg}`}>{info.icon}</div>
+            <span className={`font-medium text-sm ${info.text}`}>{info.label}</span>
           </div>
-          <span className={`font-medium ${
-            item.type === 'INCOMING' ? 'text-success' :
-            item.type === 'OUTGOING' ? 'text-primary' : 'text-error'
-          }`}>
-            {getCallTypeLabel(item.type)}
-          </span>
-        </div>
-      ),
+        );
+      },
     },
     {
       key: 'contactName',
       label: 'Contacto',
       render: (item: CallLog) => (
         <div>
-          <p className="font-medium">{item.contactName || 'Desconocido'}</p>
-          <p className="text-sm text-gray-400">{item.phoneNumber}</p>
+          <p className="font-medium text-text-primary text-sm">{item.contactName || 'Desconocido'}</p>
+          <p className="text-xs text-text-muted">{item.phoneNumber}</p>
         </div>
       ),
     },
@@ -122,14 +104,14 @@ export const CallsPage = () => {
       key: 'duration',
       label: 'Duración',
       render: (item: CallLog) => (
-        <span className="text-sm">{formatDuration(item.duration)}</span>
+        <span className="text-sm text-text-muted font-mono">{formatDuration(item.duration)}</span>
       ),
     },
     {
       key: 'timestamp',
       label: 'Fecha',
       render: (item: CallLog) => (
-        <span className="text-sm text-gray-400">{formatTimestamp(item.timestamp)}</span>
+        <span className="text-sm text-text-muted">{formatTimestamp(item.timestamp)}</span>
       ),
     },
     {
@@ -138,7 +120,7 @@ export const CallsPage = () => {
       render: (item: CallLog) => (
         <button
           onClick={() => handleDelete(item.id)}
-          className="p-2 text-gray-400 hover:text-error hover:bg-error/10 rounded-lg transition-colors"
+          className="p-2 text-text-muted hover:text-error hover:bg-error/10 rounded-lg transition-colors"
         >
           <Trash2 size={16} />
         </button>
@@ -151,78 +133,80 @@ export const CallsPage = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Registro de Llamadas</h1>
-          <p className="text-gray-400 mt-1">{callLogs.length} llamadas registradas</p>
+          <h1 className="text-2xl font-bold text-text-primary">Registro de Llamadas</h1>
+          <p className="text-sm text-text-muted mt-1">{callLogs.length} llamadas registradas</p>
         </div>
         <button
           onClick={fetchCallLogs}
-          className="flex items-center gap-2 px-4 py-2 bg-surface border border-gray-700 rounded-lg hover:bg-gray-700 transition-colors"
+          className="flex items-center gap-2 px-4 py-2.5 bg-primary hover:bg-primary-dark text-white rounded-xl transition-colors font-medium text-sm shadow-lg shadow-primary/25"
         >
-          <RefreshCw size={18} />
+          <RefreshCw size={16} />
           Sincronizar
         </button>
       </div>
 
       {/* Filters */}
-      <Card>
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1 relative">
-            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
-            <input
-              type="text"
-              placeholder="Buscar por nombre o número..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-background border border-gray-700 rounded-lg py-2.5 pl-10 pr-4 text-white placeholder-gray-500 focus:border-primary focus:outline-none"
-            />
-          </div>
-          <div className="flex gap-2">
-            {['all', 'INCOMING', 'OUTGOING', 'MISSED'].map((type) => (
-              <button
-                key={type}
-                onClick={() => setTypeFilter(type)}
-                className={`px-4 py-2 rounded-lg transition-colors ${
-                  typeFilter === type
-                    ? 'bg-primary text-white'
-                    : 'bg-background border border-gray-700 text-gray-400 hover:text-white'
-                }`}
-              >
-                {type === 'all' ? 'Todas' : getCallTypeLabel(type)}
-              </button>
-            ))}
-          </div>
+      <div className="flex flex-col md:flex-row gap-3">
+        <div className="flex-1 relative">
+          <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" />
+          <input
+            type="text"
+            placeholder="Buscar por nombre o número..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full bg-surface border border-border rounded-xl py-3 pl-11 pr-4 text-sm text-text-primary placeholder-text-muted focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+          />
         </div>
-      </Card>
+        <div className="flex gap-2">
+          {[
+            { key: 'all', label: 'Todas' },
+            { key: 'INCOMING', label: 'Entrantes' },
+            { key: 'OUTGOING', label: 'Salientes' },
+            { key: 'MISSED', label: 'Perdidas' },
+          ].map((type) => (
+            <button
+              key={type.key}
+              onClick={() => setTypeFilter(type.key)}
+              className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                typeFilter === type.key
+                  ? 'bg-primary text-white shadow-lg shadow-primary/25'
+                  : 'bg-surface border border-border text-text-muted hover:text-text-primary hover:border-primary/50'
+              }`}
+            >
+              {type.label}
+            </button>
+          ))}
+        </div>
+      </div>
 
       {/* Data Table */}
-      <Card>
-        {isLoading.callLogs ? (
-          <div className="flex items-center justify-center py-12">
-            <LoadingSpinner size="lg" />
-          </div>
-        ) : errors.callLogs ? (
+      {isLoading.callLogs ? (
+        <div className="flex items-center justify-center py-16 bg-surface rounded-xl border border-border">
+          <LoadingSpinner size="lg" />
+        </div>
+      ) : errors.callLogs ? (
+        <Card>
           <EmptyState
             icon={<Phone size={48} />}
             title="Error al cargar"
             description={errors.callLogs}
             action={
-              <button
-                onClick={fetchCallLogs}
-                className="px-4 py-2 bg-primary text-white rounded-lg"
-              >
+              <button onClick={fetchCallLogs} className="px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-medium">
                 Reintentar
               </button>
             }
           />
-        ) : (
+        </Card>
+      ) : (
+        <Card className="p-0">
           <DataTable
             columns={columns}
             data={filteredCallLogs}
             keyExtractor={(item) => item.id}
             emptyMessage="No hay llamadas registradas"
           />
-        )}
-      </Card>
+        </Card>
+      )}
     </div>
   );
 };

@@ -9,33 +9,35 @@ export const LoginPage = () => {
     clearError();
     const result = await login();
     if (result?.success) {
-      // OAuth will redirect, but for safety if we're still here
       navigate('/dashboard');
     }
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#F8FAFC] flex items-center justify-center">
-      <div className="w-full max-w-[360px] px-6">
+    <div className="min-h-screen w-full bg-background flex items-center justify-center p-4">
+      <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-14 h-14 bg-[#5B5FC7] rounded-2xl mb-4">
-            <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-primary rounded-2xl mb-5 shadow-xl shadow-primary/30">
+            <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-[#1A202C]">Myus</h1>
-          <p className="text-[#A0AEC0] mt-1">Monitoreo de dispositivos</p>
+          <h1 className="text-3xl font-bold text-text-primary tracking-tight">Myus</h1>
+          <p className="text-text-muted mt-2">Monitoreo de dispositivos</p>
         </div>
 
-        {/* Form */}
-        <div className="bg-white rounded-2xl p-8 border border-[#EDF2F7]">
-          <h2 className="text-base font-medium text-[#1A202C] mb-6 text-center">
+        {/* Card */}
+        <div className="bg-surface rounded-2xl p-8 border border-border shadow-xl">
+          <h2 className="text-base font-semibold text-text-primary mb-1 text-center">
             Iniciar sesión
           </h2>
+          <p className="text-xs text-text-muted mb-6 text-center">
+            Accede con tu cuenta para continuar
+          </p>
 
           {error && (
-            <div className="mb-5 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-xs">
+            <div className="mb-5 p-3.5 bg-error/10 border border-error/20 rounded-xl text-error text-xs">
               {error}
             </div>
           )}
@@ -43,7 +45,7 @@ export const LoginPage = () => {
           <button
             onClick={handleGoogleLogin}
             disabled={isLoading}
-            className="w-full flex items-center justify-center gap-3 bg-white border border-[#E2E8F0] hover:bg-[#F8FAFC] text-[#1A202C] font-medium py-3 rounded-lg transition-colors disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-3 bg-background border border-border hover:border-primary hover:bg-primary/5 text-text-primary font-medium py-3.5 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -55,8 +57,9 @@ export const LoginPage = () => {
           </button>
         </div>
 
-        <p className="text-center text-[#A0AEC0] text-xs mt-6">
-          Al continuar, aceptas nuestros términos y condiciones
+        <p className="text-center text-text-muted text-xs mt-6">
+          Al continuar, aceptas nuestros{' '}
+          <span className="text-primary cursor-pointer hover:underline">términos y condiciones</span>
         </p>
       </div>
     </div>

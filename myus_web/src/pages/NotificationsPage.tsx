@@ -24,7 +24,9 @@ export const NotificationsPage = () => {
     }
   };
 
-  useEffect(() => { fetchNotifications(); }, [user?.deviceId]);
+  useEffect(() => {
+    fetchNotifications();
+  }, [user?.deviceId]);
 
   const filtered = notifications.filter((n) =>
     n.title.toLowerCase().includes(search.toLowerCase()) ||
@@ -45,11 +47,11 @@ export const NotificationsPage = () => {
       key: 'appName',
       label: 'Aplicación',
       render: (item: Notification) => (
-        <div className="flex items-center gap-4">
-          <div className="p-3 bg-[#5B5FC7]/10 rounded-xl">
-            <Bell size={18} className="text-[#5B5FC7]" />
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-primary/15 rounded-lg">
+            <Bell size={16} className="text-primary" />
           </div>
-          <span className="font-medium text-base">{item.appName}</span>
+          <span className="font-medium text-text-primary text-sm">{item.appName}</span>
         </div>
       ),
     },
@@ -57,22 +59,28 @@ export const NotificationsPage = () => {
       key: 'title',
       label: 'Notificación',
       render: (item: Notification) => (
-        <div>
-          <p className="font-medium text-base truncate max-w-[250px]">{item.title}</p>
-          <p className="text-sm text-[#A0AEC0] truncate max-w-[250px]">{item.content}</p>
+        <div className="max-w-[280px]">
+          <p className="font-medium text-text-primary text-sm truncate">{item.title}</p>
+          <p className="text-xs text-text-muted truncate mt-0.5">{item.content}</p>
         </div>
       ),
     },
     {
       key: 'timestamp',
       label: 'Hora',
-      render: (item: Notification) => <span className="text-base text-[#718096]">{formatTime(item.timestamp)}</span>,
+      render: (item: Notification) => (
+        <span className="text-sm text-text-muted">{formatTime(item.timestamp)}</span>
+      ),
     },
     {
       key: 'isRead',
       label: 'Estado',
       render: (item: Notification) => (
-        <span className={`px-4 py-2 text-sm rounded-full font-medium ${item.isRead ? 'bg-[#F5F7FA] text-[#A0AEC0]' : 'bg-[#5B5FC7]/10 text-[#5B5FC7]'}`}>
+        <span className={`px-3 py-1.5 text-xs rounded-full font-semibold ${
+          item.isRead
+            ? 'bg-background text-text-muted border border-border'
+            : 'bg-primary/15 text-primary border border-primary/20'
+        }`}>
           {item.isRead ? 'Leído' : 'Nuevo'}
         </span>
       ),
@@ -83,57 +91,71 @@ export const NotificationsPage = () => {
       render: (item: Notification) => (
         <button
           onClick={() => setNotifications(notifications.filter((n) => n.id !== item.id))}
-          className="p-3 text-[#A0AEC0] hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors"
+          className="p-2 text-text-muted hover:text-error hover:bg-error/10 rounded-lg transition-colors"
         >
-          <Trash2 size={18} />
+          <Trash2 size={16} />
         </button>
       ),
     },
   ];
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-4xl font-bold text-[#1A202C]">Notificaciones</h1>
-          <p className="text-[#718096] mt-3 text-lg">{notifications.length} acumuladas</p>
+          <h1 className="text-2xl font-bold text-text-primary">Notificaciones</h1>
+          <p className="text-sm text-text-muted mt-1">{notifications.length} acumuladas</p>
         </div>
         <button
           onClick={fetchNotifications}
-          className="flex items-center gap-3 px-6 py-4 bg-white border border-[#E2E8F0] rounded-2xl text-[#718096] hover:border-[#5B5FC7] hover:text-[#5B5FC7] transition-colors font-medium text-base"
+          className="flex items-center gap-2 px-4 py-2.5 bg-primary hover:bg-primary-dark text-white rounded-xl transition-colors font-medium text-sm shadow-lg shadow-primary/25"
         >
-          <RefreshCw size={20} />
-          <span>Actualizar</span>
+          <RefreshCw size={16} />
+          Actualizar
         </button>
       </div>
 
-      <Card>
-        <div className="mb-8">
-          <div className="relative max-w-md">
-            <Search size={20} className="absolute left-5 top-1/2 -translate-y-1/2 text-[#A0AEC0]" />
-            <input
-              type="text"
-              placeholder="Buscar notificaciones..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-12 pr-5 py-4 bg-[#F5F7FA] border border-[#E2E8F0] rounded-2xl text-[#1A202C] placeholder-[#A0AEC0] focus:border-[#5B5FC7] focus:ring-2 focus:ring-[#5B5FC7]/20 outline-none text-base"
-            />
-          </div>
-        </div>
+      {/* Search */}
+      <div className="relative">
+        <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" />
+        <input
+          type="text"
+          placeholder="Buscar notificaciones..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full bg-surface border border-border rounded-xl py-3 pl-11 pr-4 text-sm text-text-primary placeholder-text-muted focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+        />
+      </div>
 
-        {isLoading.notifications ? (
-          <div className="flex items-center justify-center py-20"><LoadingSpinner size="lg" /></div>
-        ) : errors.notifications ? (
+      {/* Data Table */}
+      {isLoading.notifications ? (
+        <div className="flex items-center justify-center py-16 bg-surface rounded-xl border border-border">
+          <LoadingSpinner size="lg" />
+        </div>
+      ) : errors.notifications ? (
+        <Card>
           <EmptyState
-            icon={<Bell size={56} />}
+            icon={<Bell size={48} />}
             title="Error al cargar"
             description={errors.notifications}
-            action={<button onClick={fetchNotifications} className="px-6 py-4 bg-[#5B5FC7] text-white rounded-2xl font-semibold text-base">Reintentar</button>}
+            action={
+              <button onClick={fetchNotifications} className="px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-medium">
+                Reintentar
+              </button>
+            }
           />
-        ) : (
-          <DataTable columns={columns} data={filtered} keyExtractor={(item) => item.id} emptyMessage="Sin notificaciones" />
-        )}
-      </Card>
+        </Card>
+      ) : (
+        <Card className="p-0">
+          <DataTable
+            columns={columns}
+            data={filtered}
+            keyExtractor={(item) => item.id}
+            emptyMessage="Sin notificaciones"
+          />
+        </Card>
+      )}
     </div>
   );
 };

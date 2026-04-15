@@ -1,14 +1,18 @@
-@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
   --primary: #5B5FC7;
   --primary-hover: #4749A3;
-  --background: #F5F7FA;
-  --surface: #FFFFFF;
-  --border: #E2E8F0;
-  --text-primary: #1A202C;
-  --text-secondary: #718096;
-  --text-muted: #A0AEC0;
+  --background: #0F172A;
+  --surface: #1E293B;
+  --border: #334155;
+  --text-primary: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
 }
 
 * {

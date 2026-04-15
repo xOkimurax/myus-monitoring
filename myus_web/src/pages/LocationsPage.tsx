@@ -42,89 +42,77 @@ export const LocationsPage = () => {
     return date.toLocaleString('es-ES');
   };
 
-  const formatCoordinates = (lat: number, lng: number) => {
-    return `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
-  };
+  const formatCoordinates = (lat: number, lng: number) =>
+    `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Ubicación</h1>
-          <p className="text-gray-400 mt-1">{locations.length} ubicaciones registradas</p>
+          <h1 className="text-2xl font-bold text-text-primary">Ubicación</h1>
+          <p className="text-sm text-text-muted mt-1">{locations.length} ubicaciones registradas</p>
         </div>
         <button
           onClick={fetchLocations}
-          className="flex items-center gap-2 px-4 py-2 bg-surface border border-gray-700 rounded-lg hover:bg-gray-700 transition-colors"
+          className="flex items-center gap-2 px-4 py-2.5 bg-primary hover:bg-primary-dark text-white rounded-xl transition-colors font-medium text-sm shadow-lg shadow-primary/25"
         >
-          <RefreshCw size={18} />
+          <RefreshCw size={16} />
           Actualizar
         </button>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <StatCard title="Total Ubicaciones" value={locations.length} icon={<MapPin size={18} />} color="primary" />
         <StatCard
-          title="TotalUbicaciones"
-          value={locations.length}
-          icon={<MapPin size={24} />}
-          color="primary"
-        />
-        <StatCard
-          title="Última actualización"
+          title="Última Actualización"
           value={latestLocation ? formatTimestamp(latestLocation.timestamp) : 'N/A'}
-          icon={<Clock size={24} />}
+          icon={<Clock size={18} />}
           color="secondary"
         />
         <StatCard
-          title="Precisión promedio"
+          title="Precisión Promedio"
           value={latestLocation?.accuracy ? `${latestLocation.accuracy.toFixed(0)}m` : 'N/A'}
-          icon={<Target size={24} />}
+          icon={<Target size={18} />}
           color="warning"
         />
       </div>
 
       {/* Latest Location Card */}
       {latestLocation && (
-        <Card title="Ubicación Actual" icon={<Navigation size={20} />}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <div className="p-4 bg-background rounded-lg">
-                <p className="text-sm text-gray-400 mb-1">Latitud</p>
-                <p className="text-xl font-mono">{latestLocation.latitude.toFixed(6)}</p>
+        <Card title="Ubicación Actual" icon={<Navigation size={18} />}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[
+              { label: 'Latitud', value: latestLocation.latitude.toFixed(6) },
+              { label: 'Longitud', value: latestLocation.longitude.toFixed(6) },
+              { label: 'Altitud', value: latestLocation.altitude ? `${latestLocation.altitude.toFixed(1)}m` : 'N/A' },
+              { label: 'Precisión', value: latestLocation.accuracy ? `${latestLocation.accuracy.toFixed(1)}m` : 'N/A' },
+            ].map((item) => (
+              <div key={item.label} className="p-4 bg-background rounded-xl">
+                <p className="text-xs text-text-muted mb-1.5 font-medium uppercase tracking-wide">{item.label}</p>
+                <p className="text-xl font-mono font-semibold text-text-primary">{item.value}</p>
               </div>
-              <div className="p-4 bg-background rounded-lg">
-                <p className="text-sm text-gray-400 mb-1">Longitud</p>
-                <p className="text-xl font-mono">{latestLocation.longitude.toFixed(6)}</p>
-              </div>
-            </div>
-            <div className="space-y-4">
-              <div className="p-4 bg-background rounded-lg">
-                <p className="text-sm text-gray-400 mb-1">Altitud</p>
-                <p className="text-xl font-mono">
-                  {latestLocation.altitude ? `${latestLocation.altitude.toFixed(1)}m` : 'N/A'}
-                </p>
-              </div>
-              <div className="p-4 bg-background rounded-lg">
-                <p className="text-sm text-gray-400 mb-1">Precisión</p>
-                <p className="text-xl font-mono">
-                  {latestLocation.accuracy ? `${latestLocation.accuracy.toFixed(1)}m` : 'N/A'}
+            ))}
+          </div>
+          {latestLocation.speed !== undefined && (
+            <div className="mt-4 p-4 bg-primary/10 border border-primary/20 rounded-xl flex items-center gap-3">
+              <Navigation size={16} className="text-primary" />
+              <div>
+                <p className="text-xs text-text-muted">Velocidad</p>
+                <p className="font-semibold text-text-primary">
+                  {latestLocation.speed > 0 ? `${(latestLocation.speed * 3.6).toFixed(1)} km/h` : 'Estático'}
                 </p>
               </div>
             </div>
-          </div>
-          <div className="mt-4 p-4 bg-primary/10 border border-primary/20 rounded-lg">
-            <p className="text-sm text-gray-400">Última actualización</p>
-            <p className="font-medium">{formatTimestamp(latestLocation.timestamp)}</p>
-          </div>
+          )}
         </Card>
       )}
 
       {/* Location History */}
-      <Card title="Historial de Ubicaciones" icon={<Clock size={20} />}>
+      <Card title="Historial de Ubicaciones" icon={<Clock size={18} />}>
         {isLoading.locations ? (
-          <div className="flex items-center justify-center py-12">
+          <div className="flex items-center justify-center py-16">
             <LoadingSpinner size="lg" />
           </div>
         ) : errors.locations ? (
@@ -133,10 +121,7 @@ export const LocationsPage = () => {
             title="Error al cargar"
             description={errors.locations}
             action={
-              <button
-                onClick={fetchLocations}
-                className="px-4 py-2 bg-primary text-white rounded-lg"
-              >
+              <button onClick={fetchLocations} className="px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-medium">
                 Reintentar
               </button>
             }
@@ -148,29 +133,29 @@ export const LocationsPage = () => {
             description="Aún no se han registrado ubicaciones"
           />
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-2">
             {locations.slice(0, 20).map((location) => (
               <div
                 key={location.id}
-                className="flex items-center justify-between p-4 bg-background rounded-lg hover:bg-gray-800 transition-colors"
+                className="flex items-center justify-between p-4 bg-background rounded-xl hover:bg-background/80 transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-primary/10 rounded-lg">
+                  <div className="p-2 bg-primary/15 rounded-lg">
                     <MapPin size={16} className="text-primary" />
                   </div>
                   <div>
-                    <p className="font-medium font-mono text-sm">
+                    <p className="font-mono text-sm text-text-primary font-medium">
                       {formatCoordinates(location.latitude, location.longitude)}
                     </p>
-                    <p className="text-xs text-gray-400">
+                    <p className="text-xs text-text-muted">
                       {location.accuracy ? `Precisión: ${location.accuracy.toFixed(0)}m` : ''}
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm text-gray-400">{formatTimestamp(location.timestamp)}</p>
-                  {location.speed && (
-                    <p className="text-xs text-primary">
+                  <p className="text-sm text-text-muted">{formatTimestamp(location.timestamp)}</p>
+                  {location.speed !== undefined && (
+                    <p className="text-xs text-primary font-medium">
                       {location.speed > 0 ? `${(location.speed * 3.6).toFixed(1)} km/h` : 'Estático'}
                     </p>
                   )}

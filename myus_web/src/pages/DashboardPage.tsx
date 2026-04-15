@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Bell, Contact, Phone, MapPin, Activity } from 'lucide-react';
+import { Bell, Contact, Phone, MapPin, Activity, ArrowRight } from 'lucide-react';
 import { Card, StatCard } from '../components/common';
 import { useMonitoringStore } from '../store/monitoringStore';
 import { useAuthStore } from '../store/authStore';
@@ -45,11 +45,11 @@ export const DashboardPage = () => {
     { label: 'Ubicación', icon: MapPin, path: '/locations', color: 'error', count: stats.locationUpdates },
   ];
 
-  const colorMap: Record<string, string> = {
-    primary: '#5B5FC7',
-    secondary: '#48BB78',
-    warning: '#ED8936',
-    error: '#E53E3E',
+  const colorMap: Record<string, { bg: string; text: string }> = {
+    primary: { bg: 'bg-primary/15', text: 'text-primary' },
+    secondary: { bg: 'bg-secondary/15', text: 'text-secondary' },
+    warning: { bg: 'bg-warning/15', text: 'text-warning' },
+    error: { bg: 'bg-error/15', text: 'text-error' },
   };
 
   return (
@@ -57,47 +57,53 @@ export const DashboardPage = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#1A202C]">Dashboard</h1>
-          <p className="text-sm text-[#A0AEC0] mt-1">Dispositivo: {selectedDevice?.deviceName || 'No seleccionado'}</p>
+          <h1 className="text-2xl font-bold text-text-primary">Dashboard</h1>
+          <p className="text-sm text-text-muted mt-1">
+            Dispositivo: <span className="text-text-secondary font-medium">{selectedDevice?.deviceName || 'No seleccionado'}</span>
+          </p>
         </div>
-        <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg border border-[#EDF2F7]">
-          <Activity size={12} className="text-[#48BB78]" />
-          <span className="text-xs text-[#A0AEC0]">Monitoreo activo</span>
+        <div className="flex items-center gap-2 bg-surface px-4 py-2.5 rounded-xl border border-border">
+          <Activity size={14} className="text-secondary" />
+          <span className="text-xs text-text-muted font-medium">Monitoreo activo</span>
+          <span className="w-2 h-2 bg-secondary rounded-full animate-pulse" />
         </div>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {quickActions.map((action) => (
           <StatCard
             key={action.path}
             title={action.label}
             value={action.count}
-            icon={<action.icon size={18} />}
+            icon={<action.icon size={20} />}
             color={action.color}
           />
         ))}
       </div>
 
       {/* Quick Actions */}
-      <Card title="Acciones Rápidas">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {quickActions.map((action) => (
-            <Link
-              key={action.path}
-              to={action.path}
-              className="flex flex-col items-center p-8 bg-[#F8FAFC] rounded-xl border border-[#EDF2F7] hover:border-[#5B5FC7] transition-all text-center"
-            >
-              <div
-                className="p-3 rounded-lg mb-4"
-                style={{ backgroundColor: `${colorMap[action.color]}15` }}
+      <Card title="Acciones Rápidas" className="p-0 overflow-hidden">
+        <div className="grid grid-cols-2 lg:grid-cols-4 divide-x divide-border">
+          {quickActions.map((action) => {
+            const c = colorMap[action.color];
+            return (
+              <Link
+                key={action.path}
+                to={action.path}
+                className="flex flex-col items-center p-6 hover:bg-background/60 transition-all duration-200 text-center group"
               >
-                <action.icon size={20} style={{ color: colorMap[action.color] }} />
-              </div>
-              <span className="font-medium text-sm text-[#1A202C]">{action.label}</span>
-              <span className="text-xs text-[#A0AEC0] mt-1">{action.count} registros</span>
-            </Link>
-          ))}
+                <div className={`p-3.5 rounded-xl mb-4 ${c.bg} group-hover:scale-110 transition-transform duration-200`}>
+                  <action.icon size={20} className={c.text} />
+                </div>
+                <span className="font-semibold text-sm text-text-primary mb-1">{action.label}</span>
+                <span className="text-xs text-text-muted">{action.count} registros</span>
+                <div className="mt-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <ArrowRight size={14} className="text-text-muted" />
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </Card>
 
@@ -105,20 +111,23 @@ export const DashboardPage = () => {
       <Card title="Actividad Reciente">
         <div className="space-y-3">
           {[
-            { icon: Bell, color: '#5B5FC7', title: 'Nueva notificación', desc: 'WhatsApp - Hace 5 minutos' },
-            { icon: MapPin, color: '#48BB78', title: 'Ubicación actualizada', desc: 'Hace 10 minutos' },
-            { icon: Phone, color: '#ED8936', title: 'Llamada registrada', desc: 'Llamada entrante - Hace 30 min' },
-          ].map((item, i) => (
-            <div key={i} className="flex items-center gap-4 p-4 bg-[#F8FAFC] rounded-xl">
-              <div className="p-2 rounded-lg" style={{ backgroundColor: `${item.color}15` }}>
-                <item.icon size={14} style={{ color: item.color }} />
+            { icon: Bell, color: 'primary', title: 'Nueva notificación', desc: 'WhatsApp - Hace 5 minutos' },
+            { icon: MapPin, color: 'secondary', title: 'Ubicación actualizada', desc: 'Hace 10 minutos' },
+            { icon: Phone, color: 'warning', title: 'Llamada registrada', desc: 'Llamada entrante - Hace 30 min' },
+          ].map((item, i) => {
+            const c = colorMap[item.color];
+            return (
+              <div key={i} className="flex items-center gap-4 p-4 bg-background rounded-xl hover:bg-background/80 transition-colors">
+                <div className={`p-2.5 rounded-lg ${c.bg}`}>
+                  <item.icon size={15} className={c.text} />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-text-primary">{item.title}</p>
+                  <p className="text-xs text-text-muted mt-0.5">{item.desc}</p>
+                </div>
               </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium text-[#1A202C]">{item.title}</p>
-                <p className="text-xs text-[#A0AEC0] mt-0.5">{item.desc}</p>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </Card>
     </div>

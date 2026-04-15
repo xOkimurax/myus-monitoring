@@ -59,22 +59,19 @@ export const FilesPage = () => {
   const getOperationIcon = (operation: string) => {
     switch (operation) {
       case 'CREATE':
-        return <Plus size={16} className="text-success" />;
+        return <Plus size={15} className="text-secondary" />;
       case 'DELETE':
-        return <Minus size={16} className="text-error" />;
+        return <Minus size={15} className="text-error" />;
       default:
-        return <Edit size={16} className="text-warning" />;
+        return <Edit size={15} className="text-warning" />;
     }
   };
 
   const getOperationLabel = (operation: string) => {
     switch (operation) {
-      case 'CREATE':
-        return 'Creado';
-      case 'DELETE':
-        return 'Eliminado';
-      default:
-        return 'Modificado';
+      case 'CREATE': return 'Creado';
+      case 'DELETE': return 'Eliminado';
+      default: return 'Modificado';
     }
   };
 
@@ -97,30 +94,28 @@ export const FilesPage = () => {
     {
       key: 'operation',
       label: 'Operación',
-      render: (item: FileEvent) => (
-        <div className="flex items-center gap-2">
-          <div className={`p-2 rounded-lg ${
-            item.operation === 'CREATE' ? 'bg-success/10' :
-            item.operation === 'DELETE' ? 'bg-error/10' : 'bg-warning/10'
-          }`}>
-            {getOperationIcon(item.operation)}
+      render: (item: FileEvent) => {
+        const opColors = {
+          CREATE: { bg: 'bg-secondary/15', text: 'text-secondary' },
+          DELETE: { bg: 'bg-error/15', text: 'text-error' },
+          MODIFY: { bg: 'bg-warning/15', text: 'text-warning' },
+        };
+        const c = opColors[item.operation as keyof typeof opColors] || opColors.MODIFY;
+        return (
+          <div className="flex items-center gap-2.5">
+            <div className={`p-1.5 rounded-lg ${c.bg}`}>{getOperationIcon(item.operation)}</div>
+            <span className={`font-medium text-sm ${c.text}`}>{getOperationLabel(item.operation)}</span>
           </div>
-          <span className={`font-medium ${
-            item.operation === 'CREATE' ? 'text-success' :
-            item.operation === 'DELETE' ? 'text-error' : 'text-warning'
-          }`}>
-            {getOperationLabel(item.operation)}
-          </span>
-        </div>
-      ),
+        );
+      },
     },
     {
       key: 'fileName',
       label: 'Archivo',
       render: (item: FileEvent) => (
         <div>
-          <p className="font-medium truncate max-w-xs">{item.fileName}</p>
-          <p className="text-xs text-gray-400 truncate max-w-xs">{item.filePath}</p>
+          <p className="font-medium text-text-primary text-sm truncate max-w-[220px]">{item.fileName}</p>
+          <p className="text-xs text-text-muted truncate max-w-[220px]">{item.filePath}</p>
         </div>
       ),
     },
@@ -128,15 +123,15 @@ export const FilesPage = () => {
       key: 'fileSize',
       label: 'Tamaño',
       render: (item: FileEvent) => (
-        <span className="text-sm text-gray-400">{formatFileSize(item.fileSize)}</span>
+        <span className="text-sm text-text-muted">{formatFileSize(item.fileSize)}</span>
       ),
     },
     {
       key: 'mimeType',
       label: 'Tipo',
       render: (item: FileEvent) => (
-        <span className="px-2 py-1 text-xs bg-gray-700 rounded-full truncate max-w-xs">
-          {item.mimeType || 'Desconocido'}
+        <span className="px-2.5 py-1 text-xs bg-background text-text-muted rounded-full border border-border">
+          {item.mimeType?.split('/').pop() || 'N/A'}
         </span>
       ),
     },
@@ -144,7 +139,7 @@ export const FilesPage = () => {
       key: 'timestamp',
       label: 'Fecha',
       render: (item: FileEvent) => (
-        <span className="text-sm text-gray-400">{formatTimestamp(item.timestamp)}</span>
+        <span className="text-sm text-text-muted">{formatTimestamp(item.timestamp)}</span>
       ),
     },
     {
@@ -153,7 +148,7 @@ export const FilesPage = () => {
       render: (item: FileEvent) => (
         <button
           onClick={() => handleDelete(item.id)}
-          className="p-2 text-gray-400 hover:text-error hover:bg-error/10 rounded-lg transition-colors"
+          className="p-2 text-text-muted hover:text-error hover:bg-error/10 rounded-lg transition-colors"
         >
           <Trash2 size={16} />
         </button>
@@ -166,86 +161,88 @@ export const FilesPage = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Archivos</h1>
-          <p className="text-gray-400 mt-1">{fileEvents.length} eventos registrados</p>
+          <h1 className="text-2xl font-bold text-text-primary">Archivos</h1>
+          <p className="text-sm text-text-muted mt-1">{fileEvents.length} eventos registrados</p>
         </div>
         <button
           onClick={fetchFileEvents}
-          className="flex items-center gap-2 px-4 py-2 bg-surface border border-gray-700 rounded-lg hover:bg-gray-700 transition-colors"
+          className="flex items-center gap-2 px-4 py-2.5 bg-primary hover:bg-primary-dark text-white rounded-xl transition-colors font-medium text-sm shadow-lg shadow-primary/25"
         >
-          <RefreshCw size={18} />
+          <RefreshCw size={16} />
           Sincronizar
         </button>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <StatCard title="Total" value={stats.total} icon={<FolderOpen size={24} />} color="primary" />
-        <StatCard title="Creados" value={stats.created} icon={<Plus size={24} />} color="success" />
-        <StatCard title="Eliminados" value={stats.deleted} icon={<Minus size={24} />} color="error" />
-        <StatCard title="Modificados" value={stats.modified} icon={<Edit size={24} />} color="warning" />
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <StatCard title="Total" value={stats.total} icon={<FolderOpen size={18} />} color="primary" />
+        <StatCard title="Creados" value={stats.created} icon={<Plus size={18} />} color="secondary" />
+        <StatCard title="Eliminados" value={stats.deleted} icon={<Minus size={18} />} color="error" />
+        <StatCard title="Modificados" value={stats.modified} icon={<Edit size={18} />} color="warning" />
       </div>
 
       {/* Filters */}
-      <Card>
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1 relative">
-            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
-            <input
-              type="text"
-              placeholder="Buscar archivos..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-background border border-gray-700 rounded-lg py-2.5 pl-10 pr-4 text-white placeholder-gray-500 focus:border-primary focus:outline-none"
-            />
-          </div>
-          <div className="flex gap-2">
-            {['all', 'CREATE', 'MODIFY', 'DELETE'].map((op) => (
-              <button
-                key={op}
-                onClick={() => setOperationFilter(op)}
-                className={`px-4 py-2 rounded-lg transition-colors ${
-                  operationFilter === op
-                    ? 'bg-primary text-white'
-                    : 'bg-background border border-gray-700 text-gray-400 hover:text-white'
-                }`}
-              >
-                {op === 'all' ? 'Todos' : getOperationLabel(op)}
-              </button>
-            ))}
-          </div>
+      <div className="flex flex-col md:flex-row gap-3">
+        <div className="flex-1 relative">
+          <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" />
+          <input
+            type="text"
+            placeholder="Buscar archivos..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full bg-surface border border-border rounded-xl py-3 pl-11 pr-4 text-sm text-text-primary placeholder-text-muted focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+          />
         </div>
-      </Card>
+        <div className="flex gap-2">
+          {[
+            { key: 'all', label: 'Todos' },
+            { key: 'CREATE', label: 'Creados' },
+            { key: 'MODIFY', label: 'Modificados' },
+            { key: 'DELETE', label: 'Eliminados' },
+          ].map((op) => (
+            <button
+              key={op.key}
+              onClick={() => setOperationFilter(op.key)}
+              className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                operationFilter === op.key
+                  ? 'bg-primary text-white shadow-lg shadow-primary/25'
+                  : 'bg-surface border border-border text-text-muted hover:text-text-primary hover:border-primary/50'
+              }`}
+            >
+              {op.label}
+            </button>
+          ))}
+        </div>
+      </div>
 
       {/* Data Table */}
-      <Card>
-        {isLoading.files ? (
-          <div className="flex items-center justify-center py-12">
-            <LoadingSpinner size="lg" />
-          </div>
-        ) : errors.files ? (
+      {isLoading.files ? (
+        <div className="flex items-center justify-center py-16 bg-surface rounded-xl border border-border">
+          <LoadingSpinner size="lg" />
+        </div>
+      ) : errors.files ? (
+        <Card>
           <EmptyState
             icon={<File size={48} />}
             title="Error al cargar"
             description={errors.files}
             action={
-              <button
-                onClick={fetchFileEvents}
-                className="px-4 py-2 bg-primary text-white rounded-lg"
-              >
+              <button onClick={fetchFileEvents} className="px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-medium">
                 Reintentar
               </button>
             }
           />
-        ) : (
+        </Card>
+      ) : (
+        <Card className="p-0">
           <DataTable
             columns={columns}
             data={filteredFiles}
             keyExtractor={(item) => item.id}
             emptyMessage="No hay eventos de archivos"
           />
-        )}
-      </Card>
+        </Card>
+      )}
     </div>
   );
 };
