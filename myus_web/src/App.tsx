@@ -4,7 +4,6 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useAuth } from './hooks/useAuth';
 import { Layout } from './components/common/Layout';
-import { useAuthStore } from './store/authStore';
 import { insforge } from './api/insforgeClient';
 import {
   LoginPage,
@@ -27,9 +26,7 @@ const queryClient = new QueryClient({
   },
 });
 
-function AppRoutes() {
-  const { isAuthenticated } = useAuth();
-
+function AppRoutes({ isAuthenticated }: { isAuthenticated: boolean }) {
   if (!isAuthenticated) {
     return <LoginPage />;
   }
@@ -51,6 +48,8 @@ function AppRoutes() {
 }
 
 function App() {
+  // Use a simple ref for auth state to avoid Zustand persist timing issues
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authReady, setAuthReady] = useState(false);
   const { login } = useAuth();
   const effectRan = useRef(false);
@@ -63,58 +62,58 @@ function App() {
     const code = params.get('insforge_code');
     const error = params.get('error');
 
-    console.log('[Auth V6] Effect running, hasCode:', !!code, 'hasError:', !!error);
+    console.log('[Auth V7] Effect running, hasCode:', !!code, 'hasError:', !!error);
 
     const doLogin = async () => {
       try {
-        // First try: get session directly from SDK's token manager (fastest, sync)
+        // Get session directly from SDK's token manager
         const authModule = insforge.auth as any;
         const tokenManager = authModule?.tokenManager;
         const session = tokenManager?.getSession?.();
-        console.log('[Auth V6] getSession():', session);
+        console.log('[Auth V7] getSession():', session);
 
         if (session?.user) {
-          console.log('[Auth V6] Using tokenManager session, email:', session.user.email);
+          console.log('[Auth V7] Using tokenManager session');
           login({
             ...session.user,
             accessToken: session.accessToken,
           });
-          console.log('[Auth V6] login() called');
+          setIsAuthenticated(true);
           return;
         }
 
-        // Second try: getCurrentUser (async, may refresh token)
-        console.log('[Auth V6] No tokenManager session, calling getCurrentUser...');
+        // Fallback to getCurrentUser
+        console.log('[Auth V7] No tokenManager session, calling getCurrentUser...');
         const { data } = await insforge.auth.getCurrentUser();
-        console.log('[Auth V6] getCurrentUser data:', JSON.stringify(data));
+        console.log('[Auth V7] getCurrentUser data:', JSON.stringify(data));
 
         if (data?.user) {
-          console.log('[Auth V6] getCurrentUser user found');
-          const userForLogin = {
+          console.log('[Auth V7] User found from getCurrentUser');
+          login({
             ...data.user,
             accessToken: data.session?.accessToken || '',
-          };
-          console.log('[Auth V6] Calling login() with:', userForLogin.email);
-          login(userForLogin);
-          console.log('[Auth V6] login() returned, store state:', useAuthStore.getState());
+          });
+          setIsAuthenticated(true);
         } else {
-          console.log('[Auth V6] No user in getCurrentUser either');
+          console.log('[Auth V7] No user found');
         }
       } catch (err) {
-        console.error('[Auth V6] Error in doLogin:', err);
+        console.error('[Auth V7] Error in doLogin:', err);
       }
     };
 
     if (code) {
-      console.log('[Auth V6] OAuth code detected, waiting 3s for SDK exchange...');
-      setTimeout(async () => {
+      console.log('[Auth V7] OAuth code detected, waiting for SDK exchange...');
+      // Wait for SDK to process the OAuth callback
+      const timer = setTimeout(async () => {
         await doLogin();
         // Clean URL
         window.history.replaceState({}, '', `${window.location.pathname}`);
         setAuthReady(true);
-      }, 3000);
+      }, 2000);
+      return () => clearTimeout(timer);
     } else if (error) {
-      console.log('[Auth V6] OAuth error:', error);
+      console.log('[Auth V7] OAuth error:', error);
       window.history.replaceState({}, '', `${window.location.pathname}`);
       setAuthReady(true);
     } else {
@@ -136,7 +135,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <AppRoutes />
+        <AppRoutes isAuthenticated={isAuthenticated} />
       </BrowserRouter>
     </QueryClientProvider>
   );
