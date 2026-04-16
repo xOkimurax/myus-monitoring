@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useAuth } from './hooks/useAuth';
 import { Layout } from './components/common/Layout';
+import { useAuthStore } from './store/authStore';
 import { insforge } from './api/insforgeClient';
 import {
   LoginPage,
@@ -89,11 +90,13 @@ function App() {
 
         if (data?.user) {
           console.log('[Auth V6] getCurrentUser user found');
-          login({
+          const userForLogin = {
             ...data.user,
             accessToken: data.session?.accessToken || '',
-          });
-          console.log('[Auth V6] login() called');
+          };
+          console.log('[Auth V6] Calling login() with:', userForLogin.email);
+          login(userForLogin);
+          console.log('[Auth V6] login() returned, store state:', useAuthStore.getState());
         } else {
           console.log('[Auth V6] No user in getCurrentUser either');
         }
