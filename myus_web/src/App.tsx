@@ -62,42 +62,48 @@ function App() {
     const code = params.get('insforge_code');
     const error = params.get('error');
 
-    console.log('[Auth V5] Effect running, hasCode:', !!code, 'hasError:', !!error);
+    console.log('[Auth V6] Effect running, hasCode:', !!code, 'hasError:', !!error);
 
     const doLogin = async () => {
       try {
-        // Get session directly from SDK's token manager (set by SDK during OAuth exchange)
-        const session = (insforge.auth as any).tokenManager?.getSession?.();
-        console.log('[Auth V5] Session from tokenManager:', session);
+        // First try: get session directly from SDK's token manager (fastest, sync)
+        const authModule = insforge.auth as any;
+        const tokenManager = authModule?.tokenManager;
+        const session = tokenManager?.getSession?.();
+        console.log('[Auth V6] getSession():', session);
 
         if (session?.user) {
-          console.log('[Auth V5] Logging in with session, email:', session.user.email);
+          console.log('[Auth V6] Using tokenManager session, email:', session.user.email);
           login({
             ...session.user,
             accessToken: session.accessToken,
           });
-          console.log('[Auth V5] login() called, isAuthenticated should now be true');
+          console.log('[Auth V6] login() called');
+          return;
+        }
+
+        // Second try: getCurrentUser (async, may refresh token)
+        console.log('[Auth V6] No tokenManager session, calling getCurrentUser...');
+        const { data } = await insforge.auth.getCurrentUser();
+        console.log('[Auth V6] getCurrentUser data:', JSON.stringify(data));
+
+        if (data?.user) {
+          console.log('[Auth V6] getCurrentUser user found');
+          login({
+            ...data.user,
+            accessToken: data.session?.accessToken || '',
+          });
+          console.log('[Auth V6] login() called');
         } else {
-          console.log('[Auth V5] No session in tokenManager, trying getCurrentUser');
-          const { data } = await insforge.auth.getCurrentUser();
-          console.log('[Auth V5] getCurrentUser result:', data);
-          if (data?.user) {
-            login({
-              ...data.user,
-              accessToken: data.session?.accessToken || '',
-            });
-            console.log('[Auth V5] login() called, isAuthenticated should now be true');
-          } else {
-            console.log('[Auth V5] No user found at all');
-          }
+          console.log('[Auth V6] No user in getCurrentUser either');
         }
       } catch (err) {
-        console.error('[Auth V5] Error in doLogin:', err);
+        console.error('[Auth V6] Error in doLogin:', err);
       }
     };
 
     if (code) {
-      console.log('[Auth V5] OAuth code detected, waiting 3s for SDK exchange...');
+      console.log('[Auth V6] OAuth code detected, waiting 3s for SDK exchange...');
       setTimeout(async () => {
         await doLogin();
         // Clean URL
@@ -105,7 +111,7 @@ function App() {
         setAuthReady(true);
       }, 3000);
     } else if (error) {
-      console.log('[Auth V5] OAuth error:', error);
+      console.log('[Auth V6] OAuth error:', error);
       window.history.replaceState({}, '', `${window.location.pathname}`);
       setAuthReady(true);
     } else {
