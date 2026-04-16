@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useAuth } from './hooks/useAuth';
 import { Layout } from './components/common/Layout';
+import { insforge } from './api/insforgeClient';
 import {
   LoginPage,
   DashboardPage,
@@ -50,19 +51,33 @@ function AppRoutes() {
 
 function App() {
   const [authReady, setAuthReady] = useState(false);
+  const { login } = useAuth();
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const hasCode = params.has('insforge_code');
     const hasError = params.has('error');
 
+    const finalizeAuth = async () => {
+      try {
+        // Check if SDK has a valid session (from OAuth callback or existing session)
+        const { data } = await insforge.auth.getCurrentUser();
+        if (data?.user) {
+          // Update Zustand store with user data from SDK
+          login({ ...data.user, accessToken: data.session?.accessToken });
+        }
+      } catch {
+        // No valid session — that's fine, show login page
+      }
+      setAuthReady(true);
+    };
+
     if (hasCode || hasError) {
       // OAuth callback in progress — give SDK time to exchange code for session
-      const timer = setTimeout(() => setAuthReady(true), 2000);
+      const timer = setTimeout(finalizeAuth, 2500);
       return () => clearTimeout(timer);
     } else {
-      // No callback — auth state is already set
-      setAuthReady(true);
+      finalizeAuth();
     }
   }, []);
 
