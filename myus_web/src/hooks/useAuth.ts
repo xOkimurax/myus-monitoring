@@ -4,7 +4,19 @@ import { insforge } from '../api/insforgeClient';
 import { User } from '../types';
 
 export const useAuth = () => {
-  const { user, isAuthenticated, login, logout, setLoading, setError, error, isLoading, clearError } = useAuthStore();
+  const { user, isAuthenticated, login: storeLogin, logout, setLoading, setError, error, isLoading, clearError } = useAuthStore();
+
+  // Direct login - sets isAuthenticated without OAuth redirect (for OAuth callbacks from App.tsx)
+  const loginWithUser = useCallback((userData: User) => {
+    console.log('[useAuth] loginWithUser called, email:', userData.email);
+    localStorage.setItem('auth_token', userData.accessToken);
+    // Also persist full session so Zustand persist rehydrate works on refresh
+    localStorage.setItem('myus-auth', JSON.stringify({
+      user: userData,
+      isAuthenticated: true,
+    }));
+    storeLogin(userData);
+  }, [storeLogin]);
 
   const handleGoogleLogin = useCallback(async () => {
     clearError();
@@ -46,7 +58,7 @@ export const useAuth = () => {
         // Check if session is still valid
         const { data } = await insforge.auth.getCurrentUser();
         if (data?.user) {
-          login(userData);
+          storeLogin(userData);
           return true;
         }
         // Session expired, clear storage
@@ -58,7 +70,7 @@ export const useAuth = () => {
       }
     }
     return false;
-  }, [login]);
+  }, [storeLogin]);
 
   const handleLogout = useCallback(async () => {
     try {
@@ -77,7 +89,8 @@ export const useAuth = () => {
     isLoading,
     error,
     login: handleGoogleLogin,
-    register: handleGoogleLogin, // Same flow for register
+    loginWithUser,  // Use this from App.tsx OAuth callback
+    register: handleGoogleLogin,
     logout: handleLogout,
     clearError,
     checkAuth,

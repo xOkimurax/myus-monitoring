@@ -48,10 +48,9 @@ function AppRoutes({ isAuthenticated }: { isAuthenticated: boolean }) {
 }
 
 function App() {
-  // Use a simple ref for auth state to avoid Zustand persist timing issues
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authReady, setAuthReady] = useState(false);
-  const { login } = useAuth();
+  const { loginWithUser } = useAuth();
   const effectRan = useRef(false);
 
   useEffect(() => {
@@ -62,7 +61,7 @@ function App() {
     const code = params.get('insforge_code');
     const error = params.get('error');
 
-    console.log('[Auth V7] Effect running, hasCode:', !!code, 'hasError:', !!error);
+    console.log('[Auth V8] Effect running, hasCode:', !!code, 'hasError:', !!error);
 
     const doLogin = async () => {
       try {
@@ -70,11 +69,11 @@ function App() {
         const authModule = insforge.auth as any;
         const tokenManager = authModule?.tokenManager;
         const session = tokenManager?.getSession?.();
-        console.log('[Auth V7] getSession():', session);
+        console.log('[Auth V8] getSession():', session);
 
         if (session?.user) {
-          console.log('[Auth V7] Using tokenManager session');
-          login({
+          console.log('[Auth V8] Using tokenManager session');
+          loginWithUser({
             ...session.user,
             accessToken: session.accessToken,
           });
@@ -83,27 +82,27 @@ function App() {
         }
 
         // Fallback to getCurrentUser
-        console.log('[Auth V7] No tokenManager session, calling getCurrentUser...');
+        console.log('[Auth V8] No tokenManager session, calling getCurrentUser...');
         const { data } = await insforge.auth.getCurrentUser();
-        console.log('[Auth V7] getCurrentUser data:', JSON.stringify(data));
+        console.log('[Auth V8] getCurrentUser data:', JSON.stringify(data));
 
         if (data?.user) {
-          console.log('[Auth V7] User found from getCurrentUser');
-          login({
+          console.log('[Auth V8] User found from getCurrentUser');
+          loginWithUser({
             ...data.user,
             accessToken: data.session?.accessToken || '',
           });
           setIsAuthenticated(true);
         } else {
-          console.log('[Auth V7] No user found');
+          console.log('[Auth V8] No user found');
         }
       } catch (err) {
-        console.error('[Auth V7] Error in doLogin:', err);
+        console.error('[Auth V8] Error in doLogin:', err);
       }
     };
 
     if (code) {
-      console.log('[Auth V7] OAuth code detected, waiting for SDK exchange...');
+      console.log('[Auth V8] OAuth code detected, waiting for SDK exchange...');
       // Wait for SDK to process the OAuth callback
       const timer = setTimeout(async () => {
         await doLogin();
@@ -113,7 +112,7 @@ function App() {
       }, 2000);
       return () => clearTimeout(timer);
     } else if (error) {
-      console.log('[Auth V7] OAuth error:', error);
+      console.log('[Auth V8] OAuth error:', error);
       window.history.replaceState({}, '', `${window.location.pathname}`);
       setAuthReady(true);
     } else {
