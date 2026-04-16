@@ -49,64 +49,103 @@ function AppRoutes() {
   );
 }
 
+// Manual OAuth exchange after callback
+async function exchangeCodeManually(code: string) {
+  // Retrieve PKCE verifier from sessionStorage
+  const verifier = sessionStorage.getItem('insforge_pkce_verifier');
+  if (!verifier) {
+    console.error('[Auth] PKCE verifier not found in sessionStorage');
+    return null;
+  }
+
+  const baseUrl = 'https://jp84sgki.us-east.insforge.app';
+  const apiKey = 'ik_62254b582d90713b376c887fba194fac';
+  const response = await fetch(`${baseUrl}/api/auth/oauth/exchange`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': apiKey,
+    },
+    credentials: 'include',
+    body: JSON.stringify({ code, code_verifier: verifier }),
+  });
+
+  if (!response.ok) {
+    console.error('[Auth] Code exchange failed:', response.status);
+    return null;
+  }
+
+  const data = await response.json();
+  console.log('[Auth] Code exchange response:', data);
+  return data;
+}
+
 function App() {
   const [authReady, setAuthReady] = useState(false);
   const { login } = useAuth();
   const effectRan = useRef(false);
 
   useEffect(() => {
-    // Prevent double execution in React 18 strict mode
     if (effectRan.current) return;
     effectRan.current = true;
 
     const params = new URLSearchParams(window.location.search);
-    const hasCode = params.has('insforge_code');
-    const hasError = params.has('error');
+    const code = params.get('insforge_code');
+    const error = params.get('error');
 
     const finalizeAuth = async () => {
       console.log('[Auth] Finalizing auth...');
       try {
-        const { data, error } = await insforge.auth.getCurrentUser();
-        console.log('[Auth] getCurrentUser result:', { user: data?.user, error });
+        const { data, error: userError } = await insforge.auth.getCurrentUser();
+        console.log('[Auth] getCurrentUser:', { user: data?.user, error: userError });
 
-        if (error || !data?.user) {
-          console.log('[Auth] No user from getCurrentUser, clearing URL params');
-          // Clear URL params only if auth failed
-          const cleanParams = new URLSearchParams(window.location.search);
-          cleanParams.delete('insforge_code');
-          cleanParams.delete('error');
-          window.history.replaceState({}, '', `${window.location.pathname}`);
-          setAuthReady(true);
-          return;
+        if (data?.user) {
+          login({
+            ...data.user,
+            accessToken: data.session?.accessToken || '',
+          });
+          console.log('[Auth] Logged in via getCurrentUser');
         }
-
-        console.log('[Auth] User found, logging in:', data.user.email);
-        // Update Zustand store
-        login({
-          ...data.user,
-          accessToken: data.session?.accessToken || '',
-        });
-
-        // Clear URL params after successful auth
-        window.history.replaceState({}, '', `${window.location.pathname}`);
       } catch (err) {
-        console.error('[Auth] Error in finalizeAuth:', err);
+        console.error('[Auth] Error:', err);
       }
+      // Clean URL params
+      window.history.replaceState({}, '', `${window.location.pathname}`);
       setAuthReady(true);
     };
 
-    if (hasCode) {
-      console.log('[Auth] OAuth code detected, waiting for exchange...');
-      // Wait for SDK to exchange code → save session
-      // Some OAuth providers are slower, give it 4 seconds
-      const timer = setTimeout(finalizeAuth, 4000);
-      return () => clearTimeout(timer);
-    } else if (hasError) {
-      console.log('[Auth] OAuth error in URL, clearing and showing login');
+    if (code) {
+      console.log('[Auth] OAuth code detected, attempting manual exchange...');
+      // Try manual exchange first (more reliable than SDK internal)
+      exchangeCodeManually(code)
+        .then((sessionData) => {
+          if (sessionData?.user) {
+            console.log('[Auth] Manual exchange success, logging in');
+            login({
+              ...sessionData.user,
+              accessToken: sessionData.accessToken || '',
+            });
+            // Clear URL params
+            window.history.replaceState({}, '', `${window.location.pathname}`);
+            setAuthReady(true);
+          } else {
+            // Fall back to SDK's getCurrentUser after a delay
+            console.log('[Auth] Manual exchange no data, waiting for SDK...');
+            setTimeout(finalizeAuth, 3000);
+          }
+        })
+        .catch((err) => {
+          console.error('[Auth] Manual exchange error:', err);
+          // Fall back to SDK
+          setTimeout(finalizeAuth, 3000);
+        });
+
+      return;
+    } else if (error) {
+      console.log('[Auth] OAuth error:', error);
       window.history.replaceState({}, '', `${window.location.pathname}`);
       setAuthReady(true);
     } else {
-      // No callback, just check existing session
       finalizeAuth();
     }
   }, []);
