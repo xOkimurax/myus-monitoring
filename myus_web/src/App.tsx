@@ -76,6 +76,7 @@ function App() {
             ...session.user,
             accessToken: session.accessToken,
           });
+          console.log('[Auth V5] login() called, isAuthenticated should now be true');
         } else {
           console.log('[Auth V5] No session in tokenManager, trying getCurrentUser');
           const { data } = await insforge.auth.getCurrentUser();
@@ -85,6 +86,9 @@ function App() {
               ...data.user,
               accessToken: data.session?.accessToken || '',
             });
+            console.log('[Auth V5] login() called, isAuthenticated should now be true');
+          } else {
+            console.log('[Auth V5] No user found at all');
           }
         }
       } catch (err) {
