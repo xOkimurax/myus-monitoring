@@ -9,7 +9,12 @@ import { notificationsApi, contactsApi, callLogsApi, locationsApi } from '../api
 export const DashboardPage = () => {
   const { selectedDevice, setNotifications, setContacts, setCallLogs, setLocations } = useMonitoringStore();
   const { user } = useAuthStore();
-  const [stats, setStats] = useState({ totalNotifications: 0, totalContacts: 0, totalCalls: 0, locationUpdates: 0 });
+  const [stats, setStats] = useState({
+    totalNotifications: 0,
+    totalContacts: 0,
+    totalCalls: 0,
+    locationUpdates: 0,
+  });
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -39,17 +44,17 @@ export const DashboardPage = () => {
   }, [user?.deviceId]);
 
   const quickActions = [
-    { label: 'Notificaciones', icon: Bell, path: '/notifications', color: 'primary', count: stats.totalNotifications },
-    { label: 'Contactos', icon: Contact, path: '/contacts', color: 'secondary', count: stats.totalContacts },
-    { label: 'Llamadas', icon: Phone, path: '/calls', color: 'warning', count: stats.totalCalls },
-    { label: 'Ubicación', icon: MapPin, path: '/locations', color: 'error', count: stats.locationUpdates },
+    { label: 'Notificaciones', icon: Bell,   path: '/notifications', color: 'primary',   count: stats.totalNotifications },
+    { label: 'Contactos',       icon: Contact, path: '/contacts',      color: 'secondary', count: stats.totalContacts },
+    { label: 'Llamadas',        icon: Phone,   path: '/calls',         color: 'warning',   count: stats.totalCalls },
+    { label: 'Ubicación',       icon: MapPin,  path: '/locations',      color: 'primary',   count: stats.locationUpdates },
   ];
 
   const colorMap: Record<string, { bg: string; text: string }> = {
-    primary: { bg: 'bg-primary/15', text: 'text-primary' },
-    secondary: { bg: 'bg-secondary/15', text: 'text-secondary' },
-    warning: { bg: 'bg-warning/15', text: 'text-warning' },
-    error: { bg: 'bg-error/15', text: 'text-error' },
+    primary:   { bg: 'rgba(94,106,210,0.12)',   text: '#7170ff' },
+    secondary: { bg: 'rgba(16,185,129,0.12)',   text: '#10b981' },
+    warning:   { bg: 'rgba(245,158,11,0.12)',   text: '#f59e0b' },
+    error:     { bg: 'rgba(239,68,68,0.12)',    text: '#ef4444' },
   };
 
   return (
@@ -57,49 +62,87 @@ export const DashboardPage = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-text-primary">Dashboard</h1>
-          <p className="text-sm text-text-muted mt-1">
-            Dispositivo: <span className="text-text-secondary font-medium">{selectedDevice?.deviceName || 'No seleccionado'}</span>
+          <h1
+            className="text-2xl font-medium"
+            style={{ color: '#f7f8f8', letterSpacing: '-0.03em' }}
+          >
+            Dashboard
+          </h1>
+          <p className="text-sm mt-1" style={{ color: '#62666d' }}>
+            Dispositivo:{' '}
+            <span style={{ color: '#d0d6e0', fontWeight: 510 }}>
+              {selectedDevice?.deviceName || 'No seleccionado'}
+            </span>
           </p>
         </div>
-        <div className="flex items-center gap-2 bg-surface px-4 py-2.5 rounded-xl border border-border">
-          <Activity size={14} className="text-secondary" />
-          <span className="text-xs text-text-muted font-medium">Monitoreo activo</span>
-          <span className="w-2 h-2 bg-secondary rounded-full animate-pulse" />
+        <div
+          className="flex items-center gap-2 px-3.5 py-2 rounded-md"
+          style={{
+            backgroundColor: 'rgba(255,255,255,0.03)',
+            border: '1px solid rgba(255,255,255,0.08)',
+          }}
+        >
+          <Activity size={13} style={{ color: '#10b981' }} />
+          <span className="text-xs font-medium" style={{ color: '#62666d' }}>
+            Monitoreo activo
+          </span>
+          <span
+            className="w-1.5 h-1.5 rounded-full animate-pulse"
+            style={{ backgroundColor: '#10b981' }}
+          />
         </div>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {quickActions.map((action) => (
           <StatCard
             key={action.path}
             title={action.label}
             value={action.count}
-            icon={<action.icon size={20} />}
+            icon={<action.icon size={16} />}
             color={action.color}
           />
         ))}
       </div>
 
       {/* Quick Actions */}
-      <Card title="Acciones Rápidas" className="p-0 overflow-hidden">
-        <div className="grid grid-cols-2 lg:grid-cols-4 divide-x divide-border">
-          {quickActions.map((action) => {
+      <Card>
+        <div
+          className="grid grid-cols-2 lg:grid-cols-4"
+          style={{ border: '1px solid rgba(255,255,255,0.05)', borderRadius: '8px' }}
+        >
+          {quickActions.map((action, i) => {
             const c = colorMap[action.color];
+            const isLast = i === quickActions.length - 1;
             return (
               <Link
                 key={action.path}
                 to={action.path}
-                className="flex flex-col items-center p-6 hover:bg-background/60 transition-all duration-200 text-center group"
+                className="flex flex-col items-center p-5 text-center transition-all duration-150 group"
+                style={{
+                  borderRight: !isLast ? '1px solid rgba(255,255,255,0.05)' : undefined,
+                }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(255,255,255,0.02)'; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'; }}
               >
-                <div className={`p-3.5 rounded-xl mb-4 ${c.bg} group-hover:scale-110 transition-transform duration-200`}>
-                  <action.icon size={20} className={c.text} />
+                <div
+                  className="p-3 rounded-md mb-3 transition-transform duration-150 group-hover:scale-105"
+                  style={{ backgroundColor: c.bg }}
+                >
+                  <action.icon size={18} style={{ color: c.text }} />
                 </div>
-                <span className="font-semibold text-sm text-text-primary mb-1">{action.label}</span>
-                <span className="text-xs text-text-muted">{action.count} registros</span>
+                <span
+                  className="text-sm font-medium mb-0.5"
+                  style={{ color: '#f7f8f8', letterSpacing: '-0.01em' }}
+                >
+                  {action.label}
+                </span>
+                <span className="text-xs" style={{ color: '#62666d' }}>
+                  {action.count} registros
+                </span>
                 <div className="mt-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <ArrowRight size={14} className="text-text-muted" />
+                  <ArrowRight size={13} style={{ color: '#62666d' }} />
                 </div>
               </Link>
             );
@@ -109,21 +152,39 @@ export const DashboardPage = () => {
 
       {/* Recent Activity */}
       <Card title="Actividad Reciente">
-        <div className="space-y-3">
+        <div className="space-y-1.5">
           {[
-            { icon: Bell, color: 'primary', title: 'Nueva notificación', desc: 'WhatsApp - Hace 5 minutos' },
-            { icon: MapPin, color: 'secondary', title: 'Ubicación actualizada', desc: 'Hace 10 minutos' },
-            { icon: Phone, color: 'warning', title: 'Llamada registrada', desc: 'Llamada entrante - Hace 30 min' },
+            { icon: Bell,   color: 'primary',   title: 'Nueva notificación',      desc: 'WhatsApp — Hace 5 minutos' },
+            { icon: MapPin, color: 'primary',   title: 'Ubicación actualizada',   desc: 'Hace 10 minutos' },
+            { icon: Phone,  color: 'secondary', title: 'Llamada registrada',      desc: 'Llamada entrante — Hace 30 min' },
           ].map((item, i) => {
             const c = colorMap[item.color];
             return (
-              <div key={i} className="flex items-center gap-4 p-4 bg-background rounded-xl hover:bg-background/80 transition-colors">
-                <div className={`p-2.5 rounded-lg ${c.bg}`}>
-                  <item.icon size={15} className={c.text} />
+              <div
+                key={i}
+                className="flex items-center gap-3.5 p-3 rounded-md transition-colors duration-150 cursor-default"
+                style={{ border: '1px solid transparent' }}
+                onMouseEnter={(e) => {
+                  const el = e.currentTarget as HTMLElement;
+                  el.style.backgroundColor = 'rgba(255,255,255,0.02)';
+                  el.style.borderColor = 'rgba(255,255,255,0.05)';
+                }}
+                onMouseLeave={(e) => {
+                  const el = e.currentTarget as HTMLElement;
+                  el.style.backgroundColor = 'transparent';
+                  el.style.borderColor = 'transparent';
+                }}
+              >
+                <div className="p-2 rounded-md" style={{ backgroundColor: c.bg }}>
+                  <item.icon size={14} style={{ color: c.text }} />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-text-primary">{item.title}</p>
-                  <p className="text-xs text-text-muted mt-0.5">{item.desc}</p>
+                  <p className="text-sm font-medium" style={{ color: '#f7f8f8' }}>
+                    {item.title}
+                  </p>
+                  <p className="text-xs mt-0.5" style={{ color: '#62666d' }}>
+                    {item.desc}
+                  </p>
                 </div>
               </div>
             );

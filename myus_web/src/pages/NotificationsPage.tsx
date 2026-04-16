@@ -36,8 +36,8 @@ export const NotificationsPage = () => {
 
   const formatTime = (ts: number) => {
     const diff = Date.now() - ts;
-    if (diff < 60000) return 'Ahora';
-    if (diff < 3600000) return `Hace ${Math.floor(diff / 60000)} min`;
+    if (diff < 60000)    return 'Ahora';
+    if (diff < 3600000)  return `Hace ${Math.floor(diff / 60000)} min`;
     if (diff < 86400000) return `Hace ${Math.floor(diff / 3600000)} h`;
     return new Date(ts).toLocaleDateString('es-ES');
   };
@@ -47,11 +47,16 @@ export const NotificationsPage = () => {
       key: 'appName',
       label: 'Aplicación',
       render: (item: Notification) => (
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-primary/15 rounded-lg">
-            <Bell size={16} className="text-primary" />
+        <div className="flex items-center gap-2.5">
+          <div
+            className="p-2 rounded-md"
+            style={{ backgroundColor: 'rgba(94,106,210,0.1)' }}
+          >
+            <Bell size={14} style={{ color: '#7170ff' }} />
           </div>
-          <span className="font-medium text-text-primary text-sm">{item.appName}</span>
+          <span className="font-medium text-sm" style={{ color: '#f7f8f8' }}>
+            {item.appName}
+          </span>
         </div>
       ),
     },
@@ -60,8 +65,15 @@ export const NotificationsPage = () => {
       label: 'Notificación',
       render: (item: Notification) => (
         <div className="max-w-[280px]">
-          <p className="font-medium text-text-primary text-sm truncate">{item.title}</p>
-          <p className="text-xs text-text-muted truncate mt-0.5">{item.content}</p>
+          <p className="font-medium text-sm truncate" style={{ color: '#f7f8f8' }}>
+            {item.title}
+          </p>
+          <p
+            className="text-xs truncate mt-0.5"
+            style={{ color: '#62666d' }}
+          >
+            {item.content}
+          </p>
         </div>
       ),
     },
@@ -69,18 +81,31 @@ export const NotificationsPage = () => {
       key: 'timestamp',
       label: 'Hora',
       render: (item: Notification) => (
-        <span className="text-sm text-text-muted">{formatTime(item.timestamp)}</span>
+        <span className="text-sm" style={{ color: '#62666d' }}>
+          {formatTime(item.timestamp)}
+        </span>
       ),
     },
     {
       key: 'isRead',
       label: 'Estado',
       render: (item: Notification) => (
-        <span className={`px-3 py-1.5 text-xs rounded-full font-semibold ${
-          item.isRead
-            ? 'bg-background text-text-muted border border-border'
-            : 'bg-primary/15 text-primary border border-primary/20'
-        }`}>
+        <span
+          className="px-3 py-1 text-xs rounded-full font-medium"
+          style={
+            item.isRead
+              ? {
+                  backgroundColor: 'rgba(255,255,255,0.04)',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  color: '#62666d',
+                }
+              : {
+                  backgroundColor: 'rgba(94,106,210,0.1)',
+                  border: '1px solid rgba(94,106,210,0.25)',
+                  color: '#7170ff',
+                }
+          }
+        >
           {item.isRead ? 'Leído' : 'Nuevo'}
         </span>
       ),
@@ -91,9 +116,20 @@ export const NotificationsPage = () => {
       render: (item: Notification) => (
         <button
           onClick={() => setNotifications(notifications.filter((n) => n.id !== item.id))}
-          className="p-2 text-text-muted hover:text-error hover:bg-error/10 rounded-lg transition-colors"
+          className="p-2 rounded-md transition-all duration-150"
+          style={{ color: '#62666d' }}
+          onMouseEnter={(e) => {
+            const el = e.currentTarget as HTMLElement;
+            el.style.color = '#ef4444';
+            el.style.backgroundColor = 'rgba(239,68,68,0.08)';
+          }}
+          onMouseLeave={(e) => {
+            const el = e.currentTarget as HTMLElement;
+            el.style.color = '#62666d';
+            el.style.backgroundColor = 'transparent';
+          }}
         >
-          <Trash2 size={16} />
+          <Trash2 size={15} />
         </button>
       ),
     },
@@ -104,43 +140,70 @@ export const NotificationsPage = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-text-primary">Notificaciones</h1>
-          <p className="text-sm text-text-muted mt-1">{notifications.length} acumuladas</p>
+          <h1 className="text-2xl font-medium" style={{ color: '#f7f8f8', letterSpacing: '-0.03em' }}>
+            Notificaciones
+          </h1>
+          <p className="text-sm mt-1" style={{ color: '#62666d' }}>
+            {notifications.length} acumuladas
+          </p>
         </div>
         <button
           onClick={fetchNotifications}
-          className="flex items-center gap-2 px-4 py-2.5 bg-primary hover:bg-primary-dark text-white rounded-xl transition-colors font-medium text-sm shadow-lg shadow-primary/25"
+          className="flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium text-white transition-all duration-150"
+          style={{ backgroundColor: '#5e6ad2' }}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = '#7170ff'; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = '#5e6ad2'; }}
         >
-          <RefreshCw size={16} />
+          <RefreshCw size={14} />
           Actualizar
         </button>
       </div>
 
       {/* Search */}
       <div className="relative">
-        <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" />
+        <Search
+          size={16}
+          className="absolute left-3.5 top-1/2 -translate-y-1/2"
+          style={{ color: '#62666d' }}
+        />
         <input
           type="text"
-          placeholder="Buscar notificaciones..."
+          placeholder="Buscar notificaciones…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full bg-surface border border-border rounded-xl py-3 pl-11 pr-4 text-sm text-text-primary placeholder-text-muted focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+          className="w-full rounded-md py-2.5 pl-10 pr-4 text-sm transition-all duration-150"
+          style={{
+            backgroundColor: 'rgba(255,255,255,0.03)',
+            border: '1px solid rgba(255,255,255,0.08)',
+            color: '#f7f8f8',
+            outline: 'none',
+            letterSpacing: '-0.01em',
+          }}
+          onFocus={(e) => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(113,112,255,0.5)'; }}
+          onBlur={(e) =>  { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.08)'; }}
         />
       </div>
 
       {/* Data Table */}
       {isLoading.notifications ? (
-        <div className="flex items-center justify-center py-16 bg-surface rounded-xl border border-border">
+        <div
+          className="flex items-center justify-center py-16 rounded-lg"
+          style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
+        >
           <LoadingSpinner size="lg" />
         </div>
       ) : errors.notifications ? (
         <Card>
           <EmptyState
-            icon={<Bell size={48} />}
+            icon={<Bell size={40} />}
             title="Error al cargar"
             description={errors.notifications}
             action={
-              <button onClick={fetchNotifications} className="px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-medium">
+              <button
+                onClick={fetchNotifications}
+                className="px-4 py-2 text-sm font-medium text-white rounded-md"
+                style={{ backgroundColor: '#5e6ad2' }}
+              >
                 Reintentar
               </button>
             }

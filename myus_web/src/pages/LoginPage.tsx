@@ -14,30 +14,69 @@ export const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen w-full bg-background flex items-center justify-center p-4">
+    <div
+      className="min-h-screen w-full flex items-center justify-center p-4"
+      style={{ backgroundColor: '#08090a' }}
+    >
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-primary rounded-2xl mb-5 shadow-xl shadow-primary/30">
-            <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          <div
+            className="inline-flex items-center justify-center w-14 h-14 rounded-xl mb-5"
+            style={{ backgroundColor: '#5e6ad2' }}
+          >
+            <svg
+              className="w-7 h-7 text-white"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2.5}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
+              />
             </svg>
           </div>
-          <h1 className="text-3xl font-bold text-text-primary tracking-tight">Myus</h1>
-          <p className="text-text-muted mt-2">Monitoreo de dispositivos</p>
+          <h1
+            className="text-3xl font-medium"
+            style={{ color: '#f7f8f8', letterSpacing: '-0.04em' }}
+          >
+            Myus
+          </h1>
+          <p className="mt-2 text-sm" style={{ color: '#62666d' }}>
+            Monitoreo de dispositivos
+          </p>
         </div>
 
         {/* Card */}
-        <div className="bg-surface rounded-2xl p-8 border border-border shadow-xl">
-          <h2 className="text-base font-semibold text-text-primary mb-1 text-center">
+        <div
+          className="p-8 rounded-xl"
+          style={{
+            backgroundColor: 'rgba(255,255,255,0.03)',
+            border: '1px solid rgba(255,255,255,0.08)',
+          }}
+        >
+          <h2
+            className="text-base font-medium mb-1 text-center"
+            style={{ color: '#f7f8f8', letterSpacing: '-0.02em' }}
+          >
             Iniciar sesión
           </h2>
-          <p className="text-xs text-text-muted mb-6 text-center">
+          <p className="text-xs mb-6 text-center" style={{ color: '#62666d' }}>
             Accede con tu cuenta para continuar
           </p>
 
           {error && (
-            <div className="mb-5 p-3.5 bg-error/10 border border-error/20 rounded-xl text-error text-xs">
+            <div
+              className="mb-5 p-3.5 rounded-md text-xs"
+              style={{
+                backgroundColor: 'rgba(239,68,68,0.08)',
+                border: '1px solid rgba(239,68,68,0.2)',
+                color: '#ef4444',
+              }}
+            >
               {error}
             </div>
           )}
@@ -45,7 +84,22 @@ export const LoginPage = () => {
           <button
             onClick={handleGoogleLogin}
             disabled={isLoading}
-            className="w-full flex items-center justify-center gap-3 bg-background border border-border hover:border-primary hover:bg-primary/5 text-text-primary font-medium py-3.5 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center gap-3 py-3 rounded-md text-sm font-medium transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{
+              backgroundColor: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              color: '#d0d6e0',
+            }}
+            onMouseEnter={(e) => {
+              if (!isLoading) {
+                (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(255,255,255,0.06)';
+                (e.currentTarget as HTMLElement).style.borderColor = 'rgba(113,112,255,0.3)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(255,255,255,0.04)';
+              (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.08)';
+            }}
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -57,9 +111,16 @@ export const LoginPage = () => {
           </button>
         </div>
 
-        <p className="text-center text-text-muted text-xs mt-6">
+        <p className="text-center text-xs mt-6" style={{ color: '#62666d' }}>
           Al continuar, aceptas nuestros{' '}
-          <span className="text-primary cursor-pointer hover:underline">términos y condiciones</span>
+          <span
+            className="cursor-pointer"
+            style={{ color: '#7170ff' }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.textDecoration = 'underline'; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.textDecoration = 'none'; }}
+          >
+            términos y condiciones
+          </span>
         </p>
       </div>
     </div>

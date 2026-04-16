@@ -60,11 +60,26 @@ export const CallsPage = () => {
   const getCallInfo = (type: string) => {
     switch (type) {
       case 'INCOMING':
-        return { icon: <ArrowDownLeft size={15} className="text-secondary" />, bg: 'bg-secondary/15', text: 'text-secondary', label: 'Entrante' };
+        return {
+          icon: <ArrowDownLeft size={13} />,
+          bg:   'rgba(16,185,129,0.12)',
+          text: '#10b981',
+          label: 'Entrante',
+        };
       case 'OUTGOING':
-        return { icon: <ArrowUpRight size={15} className="text-primary" />, bg: 'bg-primary/15', text: 'text-primary', label: 'Saliente' };
+        return {
+          icon: <ArrowUpRight size={13} />,
+          bg:   'rgba(94,106,210,0.12)',
+          text: '#7170ff',
+          label: 'Saliente',
+        };
       default:
-        return { icon: <XCircle size={15} className="text-error" />, bg: 'bg-error/15', text: 'text-error', label: 'Perdida' };
+        return {
+          icon: <XCircle size={13} />,
+          bg:   'rgba(239,68,68,0.12)',
+          text: '#ef4444',
+          label: 'Perdida',
+        };
     }
   };
 
@@ -83,9 +98,13 @@ export const CallsPage = () => {
       render: (item: CallLog) => {
         const info = getCallInfo(item.type);
         return (
-          <div className="flex items-center gap-2.5">
-            <div className={`p-1.5 rounded-lg ${info.bg}`}>{info.icon}</div>
-            <span className={`font-medium text-sm ${info.text}`}>{info.label}</span>
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 rounded-md" style={{ backgroundColor: info.bg }}>
+              <span style={{ color: info.text }}>{info.icon}</span>
+            </div>
+            <span className="text-sm font-medium" style={{ color: info.text }}>
+              {info.label}
+            </span>
           </div>
         );
       },
@@ -95,8 +114,12 @@ export const CallsPage = () => {
       label: 'Contacto',
       render: (item: CallLog) => (
         <div>
-          <p className="font-medium text-text-primary text-sm">{item.contactName || 'Desconocido'}</p>
-          <p className="text-xs text-text-muted">{item.phoneNumber}</p>
+          <p className="font-medium text-sm" style={{ color: '#f7f8f8' }}>
+            {item.contactName || 'Desconocido'}
+          </p>
+          <p className="text-xs mt-0.5" style={{ color: '#62666d' }}>
+            {item.phoneNumber}
+          </p>
         </div>
       ),
     },
@@ -104,14 +127,18 @@ export const CallsPage = () => {
       key: 'duration',
       label: 'Duración',
       render: (item: CallLog) => (
-        <span className="text-sm text-text-muted font-mono">{formatDuration(item.duration)}</span>
+        <span className="text-sm font-mono" style={{ color: '#8a8f98' }}>
+          {formatDuration(item.duration)}
+        </span>
       ),
     },
     {
       key: 'timestamp',
       label: 'Fecha',
       render: (item: CallLog) => (
-        <span className="text-sm text-text-muted">{formatTimestamp(item.timestamp)}</span>
+        <span className="text-sm" style={{ color: '#62666d' }}>
+          {formatTimestamp(item.timestamp)}
+        </span>
       ),
     },
     {
@@ -120,12 +147,30 @@ export const CallsPage = () => {
       render: (item: CallLog) => (
         <button
           onClick={() => handleDelete(item.id)}
-          className="p-2 text-text-muted hover:text-error hover:bg-error/10 rounded-lg transition-colors"
+          className="p-2 rounded-md transition-all duration-150"
+          style={{ color: '#62666d' }}
+          onMouseEnter={(e) => {
+            const el = e.currentTarget as HTMLElement;
+            el.style.color = '#ef4444';
+            el.style.backgroundColor = 'rgba(239,68,68,0.08)';
+          }}
+          onMouseLeave={(e) => {
+            const el = e.currentTarget as HTMLElement;
+            el.style.color = '#62666d';
+            el.style.backgroundColor = 'transparent';
+          }}
         >
-          <Trash2 size={16} />
+          <Trash2 size={15} />
         </button>
       ),
     },
+  ];
+
+  const filterBtns = [
+    { key: 'all',      label: 'Todas' },
+    { key: 'INCOMING', label: 'Entrantes' },
+    { key: 'OUTGOING', label: 'Salientes' },
+    { key: 'MISSED',   label: 'Perdidas' },
   ];
 
   return (
@@ -133,14 +178,21 @@ export const CallsPage = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-text-primary">Registro de Llamadas</h1>
-          <p className="text-sm text-text-muted mt-1">{callLogs.length} llamadas registradas</p>
+          <h1 className="text-2xl font-medium" style={{ color: '#f7f8f8', letterSpacing: '-0.03em' }}>
+            Registro de Llamadas
+          </h1>
+          <p className="text-sm mt-1" style={{ color: '#62666d' }}>
+            {callLogs.length} llamadas registradas
+          </p>
         </div>
         <button
           onClick={fetchCallLogs}
-          className="flex items-center gap-2 px-4 py-2.5 bg-primary hover:bg-primary-dark text-white rounded-xl transition-colors font-medium text-sm shadow-lg shadow-primary/25"
+          className="flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium text-white transition-all duration-150"
+          style={{ backgroundColor: '#5e6ad2' }}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = '#7170ff'; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = '#5e6ad2'; }}
         >
-          <RefreshCw size={16} />
+          <RefreshCw size={14} />
           Sincronizar
         </button>
       </div>
@@ -148,30 +200,43 @@ export const CallsPage = () => {
       {/* Filters */}
       <div className="flex flex-col md:flex-row gap-3">
         <div className="flex-1 relative">
-          <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" />
+          <Search
+            size={16}
+            className="absolute left-3.5 top-1/2 -translate-y-1/2"
+            style={{ color: '#62666d' }}
+          />
           <input
             type="text"
-            placeholder="Buscar por nombre o número..."
+            placeholder="Buscar por nombre o número…"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-surface border border-border rounded-xl py-3 pl-11 pr-4 text-sm text-text-primary placeholder-text-muted focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+            className="w-full rounded-md py-2.5 pl-10 pr-4 text-sm transition-all duration-150"
+            style={{
+              backgroundColor: 'rgba(255,255,255,0.03)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              color: '#f7f8f8',
+              outline: 'none',
+              letterSpacing: '-0.01em',
+            }}
+            onFocus={(e) => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(113,112,255,0.5)'; }}
+            onBlur={(e) =>  { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.08)'; }}
           />
         </div>
-        <div className="flex gap-2">
-          {[
-            { key: 'all', label: 'Todas' },
-            { key: 'INCOMING', label: 'Entrantes' },
-            { key: 'OUTGOING', label: 'Salientes' },
-            { key: 'MISSED', label: 'Perdidas' },
-          ].map((type) => (
+        <div className="flex gap-1.5">
+          {filterBtns.map((type) => (
             <button
               key={type.key}
               onClick={() => setTypeFilter(type.key)}
-              className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+              className="px-3.5 py-2 rounded-md text-xs font-medium transition-all duration-150"
+              style={
                 typeFilter === type.key
-                  ? 'bg-primary text-white shadow-lg shadow-primary/25'
-                  : 'bg-surface border border-border text-text-muted hover:text-text-primary hover:border-primary/50'
-              }`}
+                  ? { backgroundColor: '#5e6ad2', color: '#ffffff' }
+                  : {
+                      backgroundColor: 'rgba(255,255,255,0.03)',
+                      border: '1px solid rgba(255,255,255,0.08)',
+                      color: '#8a8f98',
+                    }
+              }
             >
               {type.label}
             </button>
@@ -181,17 +246,24 @@ export const CallsPage = () => {
 
       {/* Data Table */}
       {isLoading.callLogs ? (
-        <div className="flex items-center justify-center py-16 bg-surface rounded-xl border border-border">
+        <div
+          className="flex items-center justify-center py-16 rounded-lg"
+          style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
+        >
           <LoadingSpinner size="lg" />
         </div>
       ) : errors.callLogs ? (
         <Card>
           <EmptyState
-            icon={<Phone size={48} />}
+            icon={<Phone size={40} />}
             title="Error al cargar"
             description={errors.callLogs}
             action={
-              <button onClick={fetchCallLogs} className="px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-medium">
+              <button
+                onClick={fetchCallLogs}
+                className="px-4 py-2 text-sm font-medium text-white rounded-md"
+                style={{ backgroundColor: '#5e6ad2' }}
+              >
                 Reintentar
               </button>
             }

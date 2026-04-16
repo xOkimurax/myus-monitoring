@@ -58,12 +58,9 @@ export const FilesPage = () => {
 
   const getOperationIcon = (operation: string) => {
     switch (operation) {
-      case 'CREATE':
-        return <Plus size={15} className="text-secondary" />;
-      case 'DELETE':
-        return <Minus size={15} className="text-error" />;
-      default:
-        return <Edit size={15} className="text-warning" />;
+      case 'CREATE': return <Plus size={13} style={{ color: '#10b981' }} />;
+      case 'DELETE': return <Minus size={13} style={{ color: '#ef4444' }} />;
+      default:       return <Edit size={13} style={{ color: '#f59e0b' }} />;
     }
   };
 
@@ -71,7 +68,7 @@ export const FilesPage = () => {
     switch (operation) {
       case 'CREATE': return 'Creado';
       case 'DELETE': return 'Eliminado';
-      default: return 'Modificado';
+      default:       return 'Modificado';
     }
   };
 
@@ -84,9 +81,9 @@ export const FilesPage = () => {
   });
 
   const stats = {
-    total: fileEvents.length,
-    created: fileEvents.filter((f) => f.operation === 'CREATE').length,
-    deleted: fileEvents.filter((f) => f.operation === 'DELETE').length,
+    total:    fileEvents.length,
+    created:  fileEvents.filter((f) => f.operation === 'CREATE').length,
+    deleted:  fileEvents.filter((f) => f.operation === 'DELETE').length,
     modified: fileEvents.filter((f) => f.operation === 'MODIFY').length,
   };
 
@@ -95,16 +92,20 @@ export const FilesPage = () => {
       key: 'operation',
       label: 'Operación',
       render: (item: FileEvent) => {
-        const opColors = {
-          CREATE: { bg: 'bg-secondary/15', text: 'text-secondary' },
-          DELETE: { bg: 'bg-error/15', text: 'text-error' },
-          MODIFY: { bg: 'bg-warning/15', text: 'text-warning' },
+        const opColors: Record<string, { bg: string; text: string }> = {
+          CREATE: { bg: 'rgba(16,185,129,0.12)',  text: '#10b981' },
+          DELETE: { bg: 'rgba(239,68,68,0.12)',    text: '#ef4444' },
+          MODIFY: { bg: 'rgba(245,158,11,0.12)',   text: '#f59e0b' },
         };
         const c = opColors[item.operation as keyof typeof opColors] || opColors.MODIFY;
         return (
-          <div className="flex items-center gap-2.5">
-            <div className={`p-1.5 rounded-lg ${c.bg}`}>{getOperationIcon(item.operation)}</div>
-            <span className={`font-medium text-sm ${c.text}`}>{getOperationLabel(item.operation)}</span>
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 rounded-md" style={{ backgroundColor: c.bg }}>
+              {getOperationIcon(item.operation)}
+            </div>
+            <span className="text-sm font-medium" style={{ color: c.text }}>
+              {getOperationLabel(item.operation)}
+            </span>
           </div>
         );
       },
@@ -114,8 +115,18 @@ export const FilesPage = () => {
       label: 'Archivo',
       render: (item: FileEvent) => (
         <div>
-          <p className="font-medium text-text-primary text-sm truncate max-w-[220px]">{item.fileName}</p>
-          <p className="text-xs text-text-muted truncate max-w-[220px]">{item.filePath}</p>
+          <p
+            className="font-medium text-sm truncate max-w-[220px]"
+            style={{ color: '#f7f8f8' }}
+          >
+            {item.fileName}
+          </p>
+          <p
+            className="text-xs truncate max-w-[220px] mt-0.5"
+            style={{ color: '#62666d' }}
+          >
+            {item.filePath}
+          </p>
         </div>
       ),
     },
@@ -123,14 +134,23 @@ export const FilesPage = () => {
       key: 'fileSize',
       label: 'Tamaño',
       render: (item: FileEvent) => (
-        <span className="text-sm text-text-muted">{formatFileSize(item.fileSize)}</span>
+        <span className="text-sm" style={{ color: '#62666d' }}>
+          {formatFileSize(item.fileSize)}
+        </span>
       ),
     },
     {
       key: 'mimeType',
       label: 'Tipo',
       render: (item: FileEvent) => (
-        <span className="px-2.5 py-1 text-xs bg-background text-text-muted rounded-full border border-border">
+        <span
+          className="px-2.5 py-1 text-xs rounded-full font-medium"
+          style={{
+            backgroundColor: 'rgba(255,255,255,0.04)',
+            border: '1px solid rgba(255,255,255,0.06)',
+            color: '#8a8f98',
+          }}
+        >
           {item.mimeType?.split('/').pop() || 'N/A'}
         </span>
       ),
@@ -139,7 +159,9 @@ export const FilesPage = () => {
       key: 'timestamp',
       label: 'Fecha',
       render: (item: FileEvent) => (
-        <span className="text-sm text-text-muted">{formatTimestamp(item.timestamp)}</span>
+        <span className="text-sm" style={{ color: '#62666d' }}>
+          {formatTimestamp(item.timestamp)}
+        </span>
       ),
     },
     {
@@ -148,12 +170,30 @@ export const FilesPage = () => {
       render: (item: FileEvent) => (
         <button
           onClick={() => handleDelete(item.id)}
-          className="p-2 text-text-muted hover:text-error hover:bg-error/10 rounded-lg transition-colors"
+          className="p-2 rounded-md transition-all duration-150"
+          style={{ color: '#62666d' }}
+          onMouseEnter={(e) => {
+            const el = e.currentTarget as HTMLElement;
+            el.style.color = '#ef4444';
+            el.style.backgroundColor = 'rgba(239,68,68,0.08)';
+          }}
+          onMouseLeave={(e) => {
+            const el = e.currentTarget as HTMLElement;
+            el.style.color = '#62666d';
+            el.style.backgroundColor = 'transparent';
+          }}
         >
-          <Trash2 size={16} />
+          <Trash2 size={15} />
         </button>
       ),
     },
+  ];
+
+  const filterBtns = [
+    { key: 'all',    label: 'Todos' },
+    { key: 'CREATE', label: 'Creados' },
+    { key: 'MODIFY', label: 'Modificados' },
+    { key: 'DELETE', label: 'Eliminados' },
   ];
 
   return (
@@ -161,53 +201,73 @@ export const FilesPage = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-text-primary">Archivos</h1>
-          <p className="text-sm text-text-muted mt-1">{fileEvents.length} eventos registrados</p>
+          <h1 className="text-2xl font-medium" style={{ color: '#f7f8f8', letterSpacing: '-0.03em' }}>
+            Archivos
+          </h1>
+          <p className="text-sm mt-1" style={{ color: '#62666d' }}>
+            {fileEvents.length} eventos registrados
+          </p>
         </div>
         <button
           onClick={fetchFileEvents}
-          className="flex items-center gap-2 px-4 py-2.5 bg-primary hover:bg-primary-dark text-white rounded-xl transition-colors font-medium text-sm shadow-lg shadow-primary/25"
+          className="flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium text-white transition-all duration-150"
+          style={{ backgroundColor: '#5e6ad2' }}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = '#7170ff'; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = '#5e6ad2'; }}
         >
-          <RefreshCw size={16} />
+          <RefreshCw size={14} />
           Sincronizar
         </button>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard title="Total" value={stats.total} icon={<FolderOpen size={18} />} color="primary" />
-        <StatCard title="Creados" value={stats.created} icon={<Plus size={18} />} color="secondary" />
-        <StatCard title="Eliminados" value={stats.deleted} icon={<Minus size={18} />} color="error" />
-        <StatCard title="Modificados" value={stats.modified} icon={<Edit size={18} />} color="warning" />
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <StatCard title="Total"       value={stats.total}    icon={<FolderOpen size={15} />} color="primary"   />
+        <StatCard title="Creados"     value={stats.created}  icon={<Plus size={15} />}       color="secondary" />
+        <StatCard title="Eliminados"  value={stats.deleted}  icon={<Minus size={15} />}      color="error"     />
+        <StatCard title="Modificados" value={stats.modified} icon={<Edit size={15} />}        color="warning"   />
       </div>
 
       {/* Filters */}
       <div className="flex flex-col md:flex-row gap-3">
         <div className="flex-1 relative">
-          <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" />
+          <Search
+            size={16}
+            className="absolute left-3.5 top-1/2 -translate-y-1/2"
+            style={{ color: '#62666d' }}
+          />
           <input
             type="text"
-            placeholder="Buscar archivos..."
+            placeholder="Buscar archivos…"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-surface border border-border rounded-xl py-3 pl-11 pr-4 text-sm text-text-primary placeholder-text-muted focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+            className="w-full rounded-md py-2.5 pl-10 pr-4 text-sm transition-all duration-150"
+            style={{
+              backgroundColor: 'rgba(255,255,255,0.03)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              color: '#f7f8f8',
+              outline: 'none',
+              letterSpacing: '-0.01em',
+            }}
+            onFocus={(e) => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(113,112,255,0.5)'; }}
+            onBlur={(e) =>  { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.08)'; }}
           />
         </div>
-        <div className="flex gap-2">
-          {[
-            { key: 'all', label: 'Todos' },
-            { key: 'CREATE', label: 'Creados' },
-            { key: 'MODIFY', label: 'Modificados' },
-            { key: 'DELETE', label: 'Eliminados' },
-          ].map((op) => (
+        <div className="flex gap-1.5">
+          {filterBtns.map((op) => (
             <button
               key={op.key}
               onClick={() => setOperationFilter(op.key)}
-              className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+              className="px-3.5 py-2 rounded-md text-xs font-medium transition-all duration-150"
+              style={
                 operationFilter === op.key
-                  ? 'bg-primary text-white shadow-lg shadow-primary/25'
-                  : 'bg-surface border border-border text-text-muted hover:text-text-primary hover:border-primary/50'
-              }`}
+                  ? { backgroundColor: '#5e6ad2', color: '#ffffff' }
+                  : {
+                      backgroundColor: 'rgba(255,255,255,0.03)',
+                      border: '1px solid rgba(255,255,255,0.08)',
+                      color: '#8a8f98',
+                    }
+              }
             >
               {op.label}
             </button>
@@ -217,17 +277,24 @@ export const FilesPage = () => {
 
       {/* Data Table */}
       {isLoading.files ? (
-        <div className="flex items-center justify-center py-16 bg-surface rounded-xl border border-border">
+        <div
+          className="flex items-center justify-center py-16 rounded-lg"
+          style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
+        >
           <LoadingSpinner size="lg" />
         </div>
       ) : errors.files ? (
         <Card>
           <EmptyState
-            icon={<File size={48} />}
+            icon={<File size={40} />}
             title="Error al cargar"
             description={errors.files}
             action={
-              <button onClick={fetchFileEvents} className="px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-medium">
+              <button
+                onClick={fetchFileEvents}
+                className="px-4 py-2 text-sm font-medium text-white rounded-md"
+                style={{ backgroundColor: '#5e6ad2' }}
+              >
                 Reintentar
               </button>
             }

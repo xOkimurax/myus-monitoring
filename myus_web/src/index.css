@@ -1,64 +1,159 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;510;590;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================
+   Linear Design System — Global Styles
+   ============================================ */
+
 :root {
-  --primary: #5B5FC7;
-  --primary-hover: #4749A3;
-  --background: #0F172A;
-  --surface: #1E293B;
-  --border: #334155;
-  --text-primary: #F1F5F9;
-  --text-secondary: #94A3B8;
-  --text-muted: #64748B;
+  /* Background surfaces */
+  --bg-marketing: #08090a;
+  --bg-panel:     #0f1011;
+  --bg-surface:   #191a1b;
+  --bg-elevated:  #28282c;
+
+  /* Text */
+  --text-primary:   #f7f8f8;
+  --text-secondary: #d0d6e0;
+  --text-muted:     #8a8f98;
+  --text-subtle:    #62666d;
+
+  /* Brand */
+  --primary:       #5e6ad2;
+  --accent:        #7170ff;
+  --accent-hover:  #828fff;
+
+  /* Status */
+  --success: #10b981;
+  --error:   #ef4444;
+  --warning: #f59e0b;
+
+  /* Borders */
+  --border-subtle:   rgba(255, 255, 255, 0.05);
+  --border-standard: rgba(255, 255, 255, 0.08);
+  --border-light:    rgba(255, 255, 255, 0.12);
 }
 
 * {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
 }
 
 html {
   font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background-color: var(--background);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--bg-marketing);
   color: var(--text-primary);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  line-height: 1.6;
+  line-height: 1.5;
+  font-feature-settings: "cv01", "ss03";
 }
 
 #root {
   min-height: 100vh;
 }
 
-/* Clean focus states */
-input:focus, button:focus, select:focus {
-  outline: none;
-}
-
-/* Transitions */
-a, button {
-  transition: all 0.2s ease;
-}
-
-/* Smooth scrollbar */
+/* ---- Scrollbar ---- */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
-
 ::-webkit-scrollbar-track {
   background: transparent;
 }
-
 ::-webkit-scrollbar-thumb {
-  background: var(--border);
+  background: rgba(255, 255, 255, 0.08);
   border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* ---- Focus ---- */
+:focus-visible {
+  outline: none;
+  box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.1), 0px 4px 12px rgba(0,0,0,0.1);
+}
+
+/* ---- Inputs & Buttons base reset ---- */
+input, button, select, textarea {
+  font-family: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* ---- Linear font weights usage ---- */
+/* 400 — regular reading text */
+/* 510 — emphasis, UI labels (Linear's signature weight) */
+/* 590 — strong emphasis, headings */
+
+/* ---- Surface utilities ---- */
+@layer components {
+  /* Translucent surface cards */
+  .surface-subtle {
+    background-color: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .surface-standard {
+    background-color: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .surface-elevated {
+    background-color: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  /* Ghost button — Linear default */
+  .btn-ghost {
+    background-color: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #e2e4e7;
+    border-radius: 6px;
+    transition: background-color 150ms, border-color 150ms, color 150ms;
+  }
+
+  .btn-ghost:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.12);
+    color: #f7f8f8;
+  }
+
+  /* Primary brand button */
+  .btn-primary {
+    background-color: #5e6ad2;
+    border: 1px solid #5e6ad2;
+    color: #ffffff;
+    border-radius: 6px;
+    transition: background-color 150ms, border-color 150ms;
+  }
+
+  .btn-primary:hover {
+    background-color: #7170ff;
+    border-color: #7170ff;
+  }
+
+  /* Subtle destructive button */
+  .btn-danger {
+    background-color: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    border-radius: 6px;
+    transition: background-color 150ms, border-color 150ms;
+  }
+
+  .btn-danger:hover {
+    background-color: rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.35);
+  }
 }

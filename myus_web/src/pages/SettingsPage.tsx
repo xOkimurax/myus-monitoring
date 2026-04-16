@@ -6,11 +6,11 @@ import { useAuth } from '../hooks/useAuth';
 export const SettingsPage = () => {
   const { user } = useAuth();
   const [settings, setSettings] = useState({
-    notificationsEnabled: true,
-    locationTrackingEnabled: true,
-    autoSync: true,
-    syncInterval: 15,
-    dataRetention: 30,
+    notificationsEnabled:     true,
+    locationTrackingEnabled:   true,
+    autoSync:                  true,
+    syncInterval:              15,
+    dataRetention:             30,
   });
   const [isSaving, setIsSaving] = useState(false);
 
@@ -20,19 +20,29 @@ export const SettingsPage = () => {
     setIsSaving(false);
   };
 
-  const Toggle = ({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) => (
+  const Toggle = ({
+    checked,
+    onChange,
+  }: {
+    checked: boolean;
+    onChange: (v: boolean) => void;
+  }) => (
     <button
       role="switch"
       aria-checked={checked}
       onClick={() => onChange(!checked)}
-      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-background ${
-        checked ? 'bg-primary' : 'bg-border'
-      }`}
+      className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-150 focus:outline-none"
+      style={{
+        backgroundColor: checked ? '#5e6ad2' : 'rgba(255,255,255,0.08)',
+        border: '1px solid rgba(255,255,255,0.1)',
+      }}
     >
       <span
-        className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform ${
-          checked ? 'translate-x-6' : 'translate-x-1'
-        }`}
+        className="inline-block h-4 w-4 rounded-full shadow-sm transition-transform duration-150"
+        style={{
+          backgroundColor: checked ? '#ffffff' : '#62666d',
+          transform: checked ? 'translateX(22px)' : 'translateX(3px)',
+        }}
       />
     </button>
   );
@@ -42,31 +52,54 @@ export const SettingsPage = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-text-primary">Configuración</h1>
-          <p className="text-sm text-text-muted mt-1">Administra tu cuenta y preferencias</p>
+          <h1 className="text-2xl font-medium" style={{ color: '#f7f8f8', letterSpacing: '-0.03em' }}>
+            Configuración
+          </h1>
+          <p className="text-sm mt-1" style={{ color: '#62666d' }}>
+            Administra tu cuenta y preferencias
+          </p>
         </div>
         <button
           onClick={handleSave}
           disabled={isSaving}
-          className="flex items-center gap-2 px-5 py-2.5 bg-primary hover:bg-primary-dark text-white rounded-xl transition-colors font-medium text-sm shadow-lg shadow-primary/25 disabled:opacity-60"
+          className="flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium text-white transition-all duration-150 disabled:opacity-50"
+          style={{ backgroundColor: '#5e6ad2' }}
+          onMouseEnter={(e) => { if (!isSaving) (e.currentTarget as HTMLElement).style.backgroundColor = '#7170ff'; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = '#5e6ad2'; }}
         >
-          <Save size={16} />
-          {isSaving ? 'Guardando...' : 'Guardar cambios'}
+          <Save size={14} />
+          {isSaving ? 'Guardando…' : 'Guardar cambios'}
         </button>
       </div>
 
       {/* Account Info */}
-      <Card title="Información de la cuenta" icon={<Shield size={18} />}>
-        <div className="space-y-3">
+      <Card title="Información de la cuenta" icon={<Shield size={15} />}>
+        <div className="space-y-1.5">
           {[
-            { label: 'Email', value: user?.email || 'No disponible' },
-            { label: 'ID de dispositivo', value: user?.deviceId || 'No disponible', mono: true },
+            { label: 'Email',         value: user?.email || 'No disponible' },
+            { label: 'ID de dispositivo', value: user?.deviceId || 'No disponible' },
             { label: 'Versión de la app', value: '1.0.0' },
           ].map((item) => (
-            <div key={item.label} className="flex items-center justify-between p-4 bg-background rounded-xl">
+            <div
+              key={item.label}
+              className="flex items-center justify-between p-3.5 rounded-md"
+              style={{ border: '1px solid rgba(255,255,255,0.05)' }}
+            >
               <div>
-                <p className="text-xs text-text-muted font-medium uppercase tracking-wide">{item.label}</p>
-                <p className={`font-medium mt-0.5 ${item.mono ? 'font-mono text-sm text-text-secondary' : 'text-text-primary'}`}>
+                <p
+                  className="text-xs font-medium uppercase"
+                  style={{ color: '#62666d', letterSpacing: '0.04em' }}
+                >
+                  {item.label}
+                </p>
+                <p
+                  className="mt-0.5 text-sm font-medium"
+                  style={{
+                    color: '#f7f8f8',
+                    fontFamily: item.label === 'ID de dispositivo' ? 'ui-monospace, monospace' : 'inherit',
+                    fontSize: item.label === 'ID de dispositivo' ? '12px' : '14px',
+                  }}
+                >
                   {item.value}
                 </p>
               </div>
@@ -76,39 +109,50 @@ export const SettingsPage = () => {
       </Card>
 
       {/* Monitoring Settings */}
-      <Card title="Configuración de monitoreo" icon={<Bell size={18} />}>
-        <div className="space-y-3">
+      <Card title="Configuración de monitoreo" icon={<Bell size={15} />}>
+        <div className="space-y-1.5">
           {[
             {
               icon: Bell,
-              iconColor: 'text-primary',
+              iconColor: '#7170ff',
               title: 'Notificaciones',
               desc: 'Monitorear notificaciones del dispositivo',
               key: 'notificationsEnabled' as const,
             },
             {
               icon: Globe,
-              iconColor: 'text-secondary',
+              iconColor: '#10b981',
               title: 'Seguimiento de ubicación',
               desc: 'GPS en tiempo real',
               key: 'locationTrackingEnabled' as const,
             },
             {
               icon: Database,
-              iconColor: 'text-warning',
+              iconColor: '#f59e0b',
               title: 'Sincronización automática',
               desc: 'Sincronizar datos periódicamente',
               key: 'autoSync' as const,
             },
           ].map((item) => (
-            <div key={item.key} className="flex items-center justify-between p-4 bg-background rounded-xl">
+            <div
+              key={item.key}
+              className="flex items-center justify-between p-3.5 rounded-md"
+              style={{ border: '1px solid rgba(255,255,255,0.05)' }}
+            >
               <div className="flex items-center gap-3">
-                <div className={`p-2.5 rounded-lg bg-background ${item.iconColor}`}>
-                  <item.icon size={17} />
+                <div
+                  className="p-2 rounded-md"
+                  style={{ backgroundColor: 'rgba(255,255,255,0.04)' }}
+                >
+                  <item.icon size={15} style={{ color: item.iconColor }} />
                 </div>
                 <div>
-                  <p className="font-medium text-text-primary text-sm">{item.title}</p>
-                  <p className="text-xs text-text-muted mt-0.5">{item.desc}</p>
+                  <p className="font-medium text-sm" style={{ color: '#f7f8f8' }}>
+                    {item.title}
+                  </p>
+                  <p className="text-xs mt-0.5" style={{ color: '#62666d' }}>
+                    {item.desc}
+                  </p>
                 </div>
               </div>
               <Toggle
@@ -121,16 +165,32 @@ export const SettingsPage = () => {
       </Card>
 
       {/* Data Management */}
-      <Card title="Gestión de datos" icon={<Database size={18} />}>
+      <Card title="Gestión de datos" icon={<Database size={15} />}>
         <div className="space-y-5">
           {[
-            { label: 'Intervalo de sincronización', key: 'syncInterval' as const, min: 5, max: 60, step: 5, unit: 'min' },
-            { label: 'Retención de datos', key: 'dataRetention' as const, min: 7, max: 90, step: 7, unit: 'días' },
+            {
+              label:     'Intervalo de sincronización',
+              key:       'syncInterval' as const,
+              min: 5, max: 60, step: 5, unit: 'min',
+            },
+            {
+              label:     'Retención de datos',
+              key:       'dataRetention' as const,
+              min: 7, max: 90, step: 7, unit: 'días',
+            },
           ].map((slider) => (
-            <div key={slider.key} className="p-4 bg-background rounded-xl">
+            <div
+              key={slider.key}
+              className="p-4 rounded-md"
+              style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}
+            >
               <div className="flex items-center justify-between mb-3">
-                <p className="text-sm font-medium text-text-primary">{slider.label}</p>
-                <span className="text-sm font-semibold text-primary">{settings[slider.key]} {slider.unit}</span>
+                <p className="text-sm font-medium" style={{ color: '#f7f8f8' }}>
+                  {slider.label}
+                </p>
+                <span className="text-sm font-medium" style={{ color: '#7170ff' }}>
+                  {settings[slider.key]} {slider.unit}
+                </span>
               </div>
               <input
                 type="range"
@@ -138,10 +198,13 @@ export const SettingsPage = () => {
                 max={slider.max}
                 step={slider.step}
                 value={settings[slider.key]}
-                onChange={(e) => setSettings({ ...settings, [slider.key]: parseInt(e.target.value) })}
-                className="w-full h-2 bg-border rounded-full appearance-none cursor-pointer accent-primary"
+                onChange={(e) =>
+                  setSettings({ ...settings, [slider.key]: parseInt(e.target.value) })
+                }
+                className="w-full h-1.5 rounded-full appearance-none cursor-pointer"
+                style={{ accentColor: '#5e6ad2', backgroundColor: 'rgba(255,255,255,0.1)' }}
               />
-              <div className="flex justify-between mt-1.5 text-xs text-text-muted">
+              <div className="flex justify-between mt-2 text-xs" style={{ color: '#62666d' }}>
                 <span>{slider.min}</span>
                 <span>{slider.max}</span>
               </div>
@@ -151,13 +214,39 @@ export const SettingsPage = () => {
       </Card>
 
       {/* Danger Zone */}
-      <Card title="Zona de peligro" icon={<AlertTriangle size={18} className="text-error" />}>
-        <div className="p-4 bg-error/5 border border-error/20 rounded-xl">
-          <h4 className="font-semibold text-error text-sm mb-1.5">Eliminar todos los datos</h4>
-          <p className="text-xs text-text-muted mb-4">
-            Esta acción eliminará todos los datos sincronizados desde este dispositivo. No se puede deshacer.
+      <Card title="Zona de peligro" icon={<AlertTriangle size={15} style={{ color: '#ef4444' }} />}>
+        <div
+          className="p-4 rounded-md"
+          style={{
+            backgroundColor: 'rgba(239,68,68,0.05)',
+            border: '1px solid rgba(239,68,68,0.15)',
+          }}
+        >
+          <h4 className="font-semibold text-sm mb-1.5" style={{ color: '#ef4444' }}>
+            Eliminar todos los datos
+          </h4>
+          <p className="text-xs mb-4" style={{ color: '#62666d' }}>
+            Esta acción eliminará todos los datos sincronizados desde este dispositivo.
+            No se puede deshacer.
           </p>
-          <button className="px-4 py-2 bg-error hover:bg-error/80 text-white rounded-xl text-sm font-medium transition-colors">
+          <button
+            className="px-4 py-2 rounded-md text-sm font-medium transition-all duration-150"
+            style={{
+              backgroundColor: 'rgba(239,68,68,0.1)',
+              border: '1px solid rgba(239,68,68,0.25)',
+              color: '#ef4444',
+            }}
+            onMouseEnter={(e) => {
+              const el = e.currentTarget as HTMLElement;
+              el.style.backgroundColor = 'rgba(239,68,68,0.15)';
+              el.style.borderColor = 'rgba(239,68,68,0.35)';
+            }}
+            onMouseLeave={(e) => {
+              const el = e.currentTarget as HTMLElement;
+              el.style.backgroundColor = 'rgba(239,68,68,0.1)';
+              el.style.borderColor = 'rgba(239,68,68,0.25)';
+            }}
+          >
             Eliminar todos los datos
           </button>
         </div>
