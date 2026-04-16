@@ -49,103 +49,66 @@ function AppRoutes() {
   );
 }
 
-// Manual OAuth exchange after callback
-async function exchangeCodeManually(code: string) {
-  // Retrieve PKCE verifier from sessionStorage
-  const verifier = sessionStorage.getItem('insforge_pkce_verifier');
-  if (!verifier) {
-    console.error('[Auth V3] PKCE verifier not found in sessionStorage');
-    return null;
-  }
-
-  const baseUrl = 'https://jp84sgki.us-east.insforge.app';
-  const apiKey = 'ik_62254b582d90713b376c887fba194fac';
-  const response = await fetch(`${baseUrl}/api/auth/oauth/exchange`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'apikey': apiKey,
-    },
-    credentials: 'include',
-    body: JSON.stringify({ code, code_verifier: verifier }),
-  });
-
-  if (!response.ok) {
-    console.error('[Auth V3] Code exchange failed:', response.status);
-    return null;
-  }
-
-  const data = await response.json();
-  console.log('[Auth] Code exchange response:', data);
-  return data;
-}
-
 function App() {
   const [authReady, setAuthReady] = useState(false);
   const { login } = useAuth();
   const effectRan = useRef(false);
 
   useEffect(() => {
-    console.log('[Auth V3] App mounted, effect running');
+    if (effectRan.current) return;
+    effectRan.current = true;
 
     const params = new URLSearchParams(window.location.search);
     const code = params.get('insforge_code');
     const error = params.get('error');
 
-    const finalizeAuth = async () => {
-      console.log('[Auth V3] Finalizing auth...');
-      try {
-        const { data, error: userError } = await insforge.auth.getCurrentUser();
-        console.log('[Auth V3] getCurrentUser:', { user: data?.user, error: userError });
+    console.log('[Auth V5] Effect running, hasCode:', !!code, 'hasError:', !!error);
 
-        if (data?.user) {
+    const doLogin = async () => {
+      try {
+        // Get session directly from SDK's token manager (set by SDK during OAuth exchange)
+        const session = (insforge.auth as any).tokenManager?.getSession?.();
+        console.log('[Auth V5] Session from tokenManager:', session);
+
+        if (session?.user) {
+          console.log('[Auth V5] Logging in with session, email:', session.user.email);
           login({
-            ...data.user,
-            accessToken: data.session?.accessToken || '',
+            ...session.user,
+            accessToken: session.accessToken,
           });
-          console.log('[Auth V3] Logged in via getCurrentUser');
+        } else {
+          console.log('[Auth V5] No session in tokenManager, trying getCurrentUser');
+          const { data } = await insforge.auth.getCurrentUser();
+          console.log('[Auth V5] getCurrentUser result:', data);
+          if (data?.user) {
+            login({
+              ...data.user,
+              accessToken: data.session?.accessToken || '',
+            });
+          }
         }
       } catch (err) {
-        console.error('[Auth V3] Error:', err);
+        console.error('[Auth V5] Error in doLogin:', err);
       }
-      // Clean URL params
-      window.history.replaceState({}, '', `${window.location.pathname}`);
-      setAuthReady(true);
     };
 
     if (code) {
-      console.log('[Auth V3] OAuth code detected, attempting manual exchange...');
-      // Try manual exchange first (more reliable than SDK internal)
-      exchangeCodeManually(code)
-        .then((sessionData) => {
-          if (sessionData?.user) {
-            console.log('[Auth V3] Manual exchange success, logging in');
-            login({
-              ...sessionData.user,
-              accessToken: sessionData.accessToken || '',
-            });
-            // Clear URL params
-            window.history.replaceState({}, '', `${window.location.pathname}`);
-            setAuthReady(true);
-          } else {
-            // Fall back to SDK's getCurrentUser after a delay
-            console.log('[Auth V3] Manual exchange no data, waiting for SDK...');
-            setTimeout(finalizeAuth, 3000);
-          }
-        })
-        .catch((err) => {
-          console.error('[Auth V3] Manual exchange error:', err);
-          // Fall back to SDK
-          setTimeout(finalizeAuth, 3000);
-        });
-
-      return;
+      console.log('[Auth V5] OAuth code detected, waiting 3s for SDK exchange...');
+      setTimeout(async () => {
+        await doLogin();
+        // Clean URL
+        window.history.replaceState({}, '', `${window.location.pathname}`);
+        setAuthReady(true);
+      }, 3000);
     } else if (error) {
-      console.log('[Auth] OAuth error:', error);
+      console.log('[Auth V5] OAuth error:', error);
       window.history.replaceState({}, '', `${window.location.pathname}`);
       setAuthReady(true);
     } else {
-      finalizeAuth();
+      (async () => {
+        await doLogin();
+        setAuthReady(true);
+      })();
     }
   }, []);
 
