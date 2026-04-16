@@ -24,11 +24,17 @@ export const useAuthStore = create<AuthState>()(
       error: null,
 
       login: (user) => {
-        console.log('[AuthStore] login() called with:', JSON.stringify(user));
+        console.log('[AuthStore] login() called with user:', user.email);
+        // Store token in localStorage first
         localStorage.setItem('auth_token', user.accessToken);
-        console.log('[AuthStore] Setting isAuthenticated=true');
-        set({ user, isAuthenticated: true, error: null });
-        console.log('[AuthStore] State after set:', useAuthStore.getState());
+        // Directly update the store state
+        useAuthStore.setState({
+          user: user,
+          isAuthenticated: true,
+          error: null,
+          isLoading: false
+        });
+        console.log('[AuthStore] State after login:', useAuthStore.getState());
       },
 
       logout: () => {
