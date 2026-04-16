@@ -54,7 +54,7 @@ async function exchangeCodeManually(code: string) {
   // Retrieve PKCE verifier from sessionStorage
   const verifier = sessionStorage.getItem('insforge_pkce_verifier');
   if (!verifier) {
-    console.error('[Auth] PKCE verifier not found in sessionStorage');
+    console.error('[Auth V3] PKCE verifier not found in sessionStorage');
     return null;
   }
 
@@ -71,7 +71,7 @@ async function exchangeCodeManually(code: string) {
   });
 
   if (!response.ok) {
-    console.error('[Auth] Code exchange failed:', response.status);
+    console.error('[Auth V3] Code exchange failed:', response.status);
     return null;
   }
 
@@ -86,28 +86,27 @@ function App() {
   const effectRan = useRef(false);
 
   useEffect(() => {
-    if (effectRan.current) return;
-    effectRan.current = true;
+    console.log('[Auth V3] App mounted, effect running');
 
     const params = new URLSearchParams(window.location.search);
     const code = params.get('insforge_code');
     const error = params.get('error');
 
     const finalizeAuth = async () => {
-      console.log('[Auth] Finalizing auth...');
+      console.log('[Auth V3] Finalizing auth...');
       try {
         const { data, error: userError } = await insforge.auth.getCurrentUser();
-        console.log('[Auth] getCurrentUser:', { user: data?.user, error: userError });
+        console.log('[Auth V3] getCurrentUser:', { user: data?.user, error: userError });
 
         if (data?.user) {
           login({
             ...data.user,
             accessToken: data.session?.accessToken || '',
           });
-          console.log('[Auth] Logged in via getCurrentUser');
+          console.log('[Auth V3] Logged in via getCurrentUser');
         }
       } catch (err) {
-        console.error('[Auth] Error:', err);
+        console.error('[Auth V3] Error:', err);
       }
       // Clean URL params
       window.history.replaceState({}, '', `${window.location.pathname}`);
@@ -115,12 +114,12 @@ function App() {
     };
 
     if (code) {
-      console.log('[Auth] OAuth code detected, attempting manual exchange...');
+      console.log('[Auth V3] OAuth code detected, attempting manual exchange...');
       // Try manual exchange first (more reliable than SDK internal)
       exchangeCodeManually(code)
         .then((sessionData) => {
           if (sessionData?.user) {
-            console.log('[Auth] Manual exchange success, logging in');
+            console.log('[Auth V3] Manual exchange success, logging in');
             login({
               ...sessionData.user,
               accessToken: sessionData.accessToken || '',
@@ -130,12 +129,12 @@ function App() {
             setAuthReady(true);
           } else {
             // Fall back to SDK's getCurrentUser after a delay
-            console.log('[Auth] Manual exchange no data, waiting for SDK...');
+            console.log('[Auth V3] Manual exchange no data, waiting for SDK...');
             setTimeout(finalizeAuth, 3000);
           }
         })
         .catch((err) => {
-          console.error('[Auth] Manual exchange error:', err);
+          console.error('[Auth V3] Manual exchange error:', err);
           // Fall back to SDK
           setTimeout(finalizeAuth, 3000);
         });
